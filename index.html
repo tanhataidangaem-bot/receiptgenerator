@@ -1,35 +1,488 @@
-NT
-Receipt Generator
-Natural Thai Massage & Skincare – Remedial Massage
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receipt Generator – Natural Thai Massage & Skincare</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root { --gold:#B8963E; --gold-light:#F5EDD8; --dark:#2C2A22; --muted:#6B6557; --border:#DDD8CC; --brown:#5C3410; }
+  * { box-sizing:border-box; }
+  body { background:#F9F7F3; font-family:'Segoe UI',system-ui,sans-serif; color:var(--dark); min-height:100vh; }
+  .app-header { background:var(--dark); color:#fff; padding:1rem 1.5rem; display:flex; align-items:center; gap:12px; }
+  .app-header h1 { font-size:1.05rem; font-weight:600; margin:0; }
+  .app-header p { font-size:0.8rem; margin:0; opacity:0.6; }
+  .header-logo { width:48px; height:48px; border-radius:50%; background:var(--brown); display:flex; align-items:center; justify-content:center; flex-shrink:0; border:3px solid #3D2008; box-shadow:0 0 0 2px #A0601E; color:#fff; font-weight:700; font-size:0.95rem; }
+  .sync-badge { margin-left:auto; font-size:0.72rem; padding:4px 10px; border-radius:12px; display:flex; align-items:center; gap:5px; }
+  .sync-on { background:#16623422; color:#7CF0A8; }
+  .sync-off { background:#7c2d2d44; color:#F5A8A8; }
+  .sync-loading { background:#7c6a2d44; color:#F0E07C; }
+  .main-wrap { display:grid; grid-template-columns:440px 1fr; min-height:calc(100vh - 62px); }
+  @media(max-width:900px){ .main-wrap{ grid-template-columns:1fr; } }
+  .form-panel { background:#fff; border-right:1px solid var(--border); padding:1.5rem; overflow-y:auto; }
+  .section-label { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:0.5rem; margin-top:1.25rem; }
+  .form-control,.form-select { border:1px solid var(--border); border-radius:6px; font-size:0.9rem; }
+  .form-control:focus,.form-select:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,150,62,0.15); }
+  .btn-generate { background:var(--dark); color:#fff; border:none; width:100%; padding:0.75rem; border-radius:8px; font-weight:600; font-size:0.95rem; cursor:pointer; }
+  .btn-generate:hover { background:#444; }
+  .btn-print { background:var(--gold); color:#fff; border:none; width:100%; padding:0.65rem; border-radius:8px; font-weight:600; font-size:0.9rem; cursor:pointer; }
+  .btn-print:hover { background:#9a7d32; }
+  .history-item { background:var(--gold-light); border-radius:6px; padding:0.6rem 0.8rem; margin-bottom:0.5rem; cursor:pointer; border:1px solid transparent; font-size:0.82rem; display:flex; justify-content:space-between; align-items:center; }
+  .history-item:hover { border-color:var(--gold); }
+  .history-item .del-btn { background:none; border:none; color:#c0392b; font-size:1rem; cursor:pointer; padding:0; line-height:1; }
+  .badge-fund { background:var(--dark); color:#fff; font-size:0.68rem; padding:2px 7px; border-radius:10px; }
+  .preview-panel { background:#E8E4DC; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:2rem 1rem; overflow-y:auto; }
+  .preview-panel h5 { font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:1rem; }
+  #receipt-wrapper { width:100%; max-width:520px; }
+  #receipt { background:#fff; border-radius:4px; box-shadow:0 2px 20px rgba(0,0,0,0.12); }
+  @media print { body * { visibility:hidden; } #receipt, #receipt * { visibility:visible; } #receipt { position:fixed; top:0; left:0; width:100%; margin:0; box-shadow:none; border-radius:0; } }
+  .empty-state { text-align:center; color:var(--muted); padding:3rem 1rem; font-size:0.9rem; }
+  .empty-state i { font-size:3rem; opacity:0.25; display:block; margin-bottom:0.75rem; }
+  #f-fund { font-weight:600; color:var(--dark); }
+  #f-fund optgroup { font-weight:700; color:var(--gold); font-style:normal; background:#fff; }
+  #f-fund option { color:var(--dark); font-weight:400; padding:4px; }
+  .fund-row { display:flex; gap:6px; align-items:center; margin-bottom:6px; font-size:0.82rem; background:#f8f4ec; border-radius:6px; padding:6px 8px; }
+  .fund-row .fund-name { font-weight:700; color:var(--dark); min-width:150px; flex:1; }
+  .fund-row .fund-num-input { width:130px; font-size:0.8rem; padding:3px 6px; border:1px solid var(--border); border-radius:5px; color:var(--gold); font-weight:700; background:#fffdf6; }
+  .fund-row .fund-del { background:none; border:none; color:#c0392b; cursor:pointer; font-size:1rem; padding:0; margin-left:2px; }
+  .fund-group-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--gold); margin:10px 0 4px 2px; }
+  .add-fund-row { display:flex; gap:6px; }
+  .add-fund-row input { flex:1; }
+  .setup-banner { background:#FEF3C7; color:#92400E; border:1px solid #D97706; border-radius:8px; padding:0.75rem 1rem; font-size:0.83rem; margin-bottom:1rem; }
+  .fund-panel-scroll { max-height:340px; overflow-y:auto; padding-right:4px; }
+</style>
+</head>
+<body>
 
-Connecting…
-PATIENT DETAILS
-Patient Name
+<div class="app-header">
+  <div class="header-logo">NT</div>
+  <div>
+    <h1>Receipt Generator</h1>
+    <p>Natural Thai Massage &amp; Skincare – Remedial Massage</p>
+  </div>
+  <div id="sync-badge" class="sync-badge sync-loading"><i class="bi bi-cloud"></i><span id="sync-text">Connecting…</span></div>
+</div>
 
-RECEIPT INFO
-Payment Date
+<div class="main-wrap">
+  <div class="form-panel">
 
-Amount ($)
+    <div id="setup-banner" class="setup-banner d-none">
+      <strong><i class="bi bi-exclamation-triangle me-1"></i>ยังไม่ได้เชื่อม Google Sheet</strong><br>
+      เปิดปุ่ม <b>Settings</b> ด้านล่าง แล้ววาง URL ของ Apps Script เพื่อให้ข้อมูล sync ทุกเครื่อง
+    </div>
 
-SERVICE / ITEM CODE
-Item Code
-          205
-          105
-        
-Service
-Remedial Massage
-HEALTH FUND / PROVIDER
+    <div class="section-label">Patient Details</div>
+    <div class="mb-2">
+      <label class="form-label small mb-1">Patient Name</label>
+      <input type="text" class="form-control" id="f-name" placeholder="e.g. Tanny Dan">
+    </div>
 
-+ Manage / add funds
-THERAPIST
-        Tanhatai Dangam
-        Other / Custom
-      
-Generate Receipt Print / Save PDF
-RECENT RECEIPTS
-Loading…
-Settings
-PREVIEW
+    <div class="section-label">Receipt Info</div>
+    <div class="row g-2 mb-2">
+      <div class="col">
+        <label class="form-label small mb-1">Payment Date</label>
+        <input type="date" class="form-control" id="f-date">
+      </div>
+      <div class="col">
+        <label class="form-label small mb-1">Amount ($)</label>
+        <input type="number" class="form-control" id="f-amount" placeholder="110" min="0">
+      </div>
+    </div>
 
-Fill in the form and click Generate Receipt
+    <div class="section-label">Service / Item Code</div>
+    <div class="row g-2 mb-2">
+      <div class="col-5">
+        <label class="form-label small mb-1">Item Code</label>
+        <select class="form-select" id="f-itemcode">
+          <option value="205">205</option>
+          <option value="105">105</option>
+        </select>
+      </div>
+      <div class="col-7">
+        <label class="form-label small mb-1">Service</label>
+        <input type="text" class="form-control" id="f-service" value="Remedial Massage">
+      </div>
+    </div>
 
+    <div class="section-label">Health Fund / Provider</div>
+    <div class="mb-2"><select class="form-select" id="f-fund"></select></div>
+
+    <div class="mb-2">
+      <button onclick="toggleFundPanel()" style="background:none;border:none;font-size:0.75rem;color:var(--gold);cursor:pointer;padding:2px 0;text-decoration:underline;" id="fund-toggle-btn">+ Manage / add funds</button>
+      <div id="fund-panel" style="display:none;background:#F9F7F3;border-radius:8px;padding:0.65rem;margin-top:6px;">
+        <div id="custom-fund-list" class="fund-panel-scroll"></div>
+        <div class="add-fund-row mt-2">
+          <input type="text" class="form-control form-control-sm" id="new-fund-name" placeholder="Fund name (e.g. Bupa)">
+          <input type="text" class="form-control form-control-sm" id="new-fund-no" placeholder="Provider No.">
+          <button class="btn btn-sm btn-outline-secondary" onclick="addCustomFund()" style="white-space:nowrap;font-size:0.78rem;">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Therapist</div>
+    <div class="mb-2">
+      <select class="form-select" id="f-therapist" onchange="toggleCustomTherapist()">
+        <option value="Tanhatai Dangam|TD">Tanhatai Dangam</option>
+        <option value="Custom|OT">Other / Custom</option>
+      </select>
+    </div>
+    <div class="mb-3 d-none" id="custom-therapist-wrap">
+      <label class="form-label small mb-1">Therapist Name</label>
+      <input type="text" class="form-control" id="f-custom-therapist" placeholder="Full name">
+    </div>
+
+    <button class="btn-generate mb-2" onclick="generateReceipt()"><i class="bi bi-file-earmark-text me-2"></i>Generate Receipt</button>
+    <button class="btn-print" onclick="printReceipt()"><i class="bi bi-printer me-2"></i>Print / Save PDF</button>
+
+    <div class="section-label mt-3">Recent Receipts <span id="hist-count" style="color:var(--muted);font-weight:400;"></span></div>
+    <div id="history-list"><div style="font-size:0.8rem;color:var(--muted);padding:0.25rem 0;">Loading…</div></div>
+
+    <button class="btn btn-sm btn-outline-secondary mt-3 w-100" onclick="toggleSettings()"><i class="bi bi-gear me-1"></i>Settings</button>
+    <div id="settings-panel" style="display:none;background:#F9F7F3;border-radius:8px;padding:0.75rem;margin-top:8px;">
+      <label class="form-label small mb-1" style="font-weight:600;">Google Apps Script URL</label>
+      <input type="text" class="form-control form-control-sm mb-2" id="api-url" placeholder="https://script.google.com/macros/s/.../exec">
+      <button class="btn btn-sm btn-dark w-100" onclick="saveApiUrl()">Save &amp; Connect</button>
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:6px;">วาง URL ที่ได้จากการ deploy Apps Script</div>
+    </div>
+
+  </div>
+
+  <div class="preview-panel">
+    <h5><i class="bi bi-eye me-1"></i>Preview</h5>
+    <div id="receipt-wrapper">
+      <div class="empty-state"><i class="bi bi-file-earmark-medical"></i>Fill in the form and click <strong>Generate Receipt</strong></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FUNDS_KEY = 'ntm_funds_data_v2';
+const API_KEY = 'ntm_api_url';
+
+let API_URL = localStorage.getItem(API_KEY) || '';
+let cachedReceipts = [];
+
+function defaultFunds(){
+  return [
+    {name:'HCF', no:'00367300', group:null},
+    {name:'Medibank', no:'A367601A', group:null},
+    {name:'ahm', no:'21280255', group:null},
+    {name:'NIB', no:'AAMT47892', group:null},
+    {name:'GU Health', no:'AAMT47892', group:null},
+    {name:'Australian Unity', no:'AAMT47892', group:null},
+    {name:'CBHS', no:'AAMT47892', group:null},
+    {name:'ARHG', no:'MT47892R', group:null},
+    {name:'Bupa', no:'Pending', group:null},
+    {name:'ACA Health Benefits Funds', no:'MT47892R', group:'ARHG'},
+    {name:'AIA Health', no:'MT47892R', group:'ARHG'},
+    {name:'Defence Health', no:'MT47892R', group:'ARHG'},
+    {name:'Emergency Services Health', no:'MT47892R', group:'ARHG'},
+    {name:'GMHBA (incl. Frank and Budget Direct)', no:'MT47892R', group:'ARHG'},
+    {name:'HBF (incl. see-u by HBF)', no:'MT47892R', group:'ARHG'},
+    {name:'Health Care Insurance Limited', no:'MT47892R', group:'ARHG'},
+    {name:'Health Insurance Fund (HIF) WA', no:'MT47892R', group:'ARHG'},
+    {name:'Health Partners', no:'MT47892R', group:'ARHG'},
+    {name:'Hunter Health Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Latrobe Health Services', no:'MT47892R', group:'ARHG'},
+    {name:'Mildura District Hospital Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Navy Health Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Nurses and Midwives Health', no:'MT47892R', group:'ARHG'},
+    {name:'Onemedifund', no:'MT47892R', group:'ARHG'},
+    {name:'Peoplecare Health Insurance (incl. Allianz)', no:'MT47892R', group:'ARHG'},
+    {name:'Phoenix Health Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Police Health Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Queensland Country Health Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Railway and Transport Health (RT Health)', no:'MT47892R', group:'ARHG'},
+    {name:'Reserve Bank Health Society', no:'MT47892R', group:'ARHG'},
+    {name:'St Lukes Health', no:'MT47892R', group:'ARHG'},
+    {name:'Teachers Federation Health (incl. Uni Health)', no:'MT47892R', group:'ARHG'},
+    {name:'Teachers Union Health', no:'MT47892R', group:'ARHG'},
+    {name:'Territory Health Fund', no:'MT47892R', group:'ARHG'},
+    {name:'Transport Health', no:'MT47892R', group:'ARHG'},
+    {name:'Westfund', no:'MT47892R', group:'ARHG'},
+    {name:'APIA Health Insurance', no:'AAMT47892', group:'NIB'},
+    {name:'Qantas Health Insurance', no:'AAMT47892', group:'NIB'},
+    {name:'Suncorp Health Insurance', no:'AAMT47892', group:'NIB'},
+    {name:'AAMI Health Insurance', no:'AAMT47892', group:'NIB'}
+  ];
+}
+
+function loadFunds(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(FUNDS_KEY));
+    if(saved && Array.isArray(saved) && saved.length) return saved;
+  }catch(e){}
+  const d = defaultFunds();
+  saveFunds(d);
+  return d;
+}
+function saveFunds(list){ localStorage.setItem(FUNDS_KEY, JSON.stringify(list)); }
+
+let FUNDS = loadFunds();
+
+function rebuildFundSelect(){
+  const sel = document.getElementById('f-fund');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Select provider --</option>';
+
+  const topLevel = FUNDS.filter(function(f){ return !f.group; });
+  const groups = {};
+  FUNDS.filter(function(f){ return f.group; }).forEach(function(f){
+    if(!groups[f.group]) groups[f.group] = [];
+    groups[f.group].push(f);
+  });
+
+  topLevel.forEach(function(f){
+    const o = document.createElement('option');
+    o.value = f.name + '|' + f.no;
+    o.textContent = f.name + ' \u2014 ' + f.no;
+    sel.appendChild(o);
+  });
+
+  Object.keys(groups).sort().forEach(function(g){
+    const og = document.createElement('optgroup');
+    og.label = g + ' sub-funds';
+    groups[g].forEach(function(f){
+      const o = document.createElement('option');
+      o.value = f.name + '|' + f.no;
+      o.textContent = f.name + ' \u2014 ' + f.no;
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+
+  if(cur) sel.value = cur;
+}
+
+function renderCustomFundList(){
+  const el = document.getElementById('custom-fund-list');
+  const topLevel = FUNDS.filter(function(f){ return !f.group; });
+  const groups = {};
+  FUNDS.filter(function(f){ return f.group; }).forEach(function(f){
+    if(!groups[f.group]) groups[f.group] = [];
+    groups[f.group].push(f);
+  });
+
+  let html = '<div class="fund-group-label">Top-level funds</div>';
+  topLevel.forEach(function(f){
+    const realIdx = FUNDS.indexOf(f);
+    html += fundRowHtml(f, realIdx);
+  });
+
+  Object.keys(groups).sort().forEach(function(g){
+    html += '<div class="fund-group-label">' + escHtml(g) + ' sub-funds</div>';
+    groups[g].forEach(function(f){
+      const realIdx = FUNDS.indexOf(f);
+      html += fundRowHtml(f, realIdx);
+    });
+  });
+
+  el.innerHTML = html;
+}
+
+function fundRowHtml(f, idx){
+  return '<div class="fund-row">' +
+    '<span class="fund-name">' + escHtml(f.name) + '</span>' +
+    '<input type="text" class="fund-num-input" value="' + escHtml(f.no) + '" onchange="updateFundNo(' + idx + ', this.value)">' +
+    '<button class="fund-del" onclick="deleteFund(' + idx + ')">&#x2715;</button>' +
+  '</div>';
+}
+
+function updateFundNo(idx, value){
+  FUNDS[idx].no = value;
+  saveFunds(FUNDS);
+  rebuildFundSelect();
+}
+
+function deleteFund(idx){
+  if(!confirm('Delete "' + FUNDS[idx].name + '"?')) return;
+  FUNDS.splice(idx, 1);
+  saveFunds(FUNDS);
+  rebuildFundSelect();
+  renderCustomFundList();
+}
+
+function addCustomFund(){
+  const name = document.getElementById('new-fund-name').value.trim();
+  const no = document.getElementById('new-fund-no').value.trim();
+  if(!name || !no){ alert('Please enter both fund name and provider number.'); return; }
+  FUNDS.push({name:name, no:no, group:null});
+  saveFunds(FUNDS);
+  document.getElementById('new-fund-name').value = '';
+  document.getElementById('new-fund-no').value = '';
+  rebuildFundSelect();
+  renderCustomFundList();
+}
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function setSync(state, text){
+  const b = document.getElementById('sync-badge');
+  const t = document.getElementById('sync-text');
+  b.className = 'sync-badge ' + (state === 'on' ? 'sync-on' : state === 'off' ? 'sync-off' : 'sync-loading');
+  t.textContent = text;
+  document.getElementById('setup-banner').classList.toggle('d-none', state !== 'off');
+}
+
+async function apiCall(params){
+  if(!API_URL) throw new Error('No API URL configured');
+  const url = API_URL + '?' + new URLSearchParams(params).toString();
+  const res = await fetch(url, { method:'GET', redirect:'follow' });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
+
+async function refreshHistory(){
+  if(!API_URL){ setSync('off','Not connected'); renderHistory([]); return; }
+  setSync('loading','Syncing...');
+  try{
+    const r = await apiCall({action:'list'});
+    if(r.ok){ cachedReceipts = r.receipts || []; renderHistory(cachedReceipts); setSync('on','Synced'); }
+    else { setSync('off','Error'); }
+  }catch(e){ setSync('off','Offline'); renderHistory([]); }
+}
+
+async function generateReceipt(){
+  const name = document.getElementById('f-name').value.trim();
+  const date = document.getElementById('f-date').value;
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const itemCode = document.getElementById('f-itemcode').value;
+  const service = (document.getElementById('f-service').value || 'Remedial Massage').trim();
+  const fundRaw = document.getElementById('f-fund').value;
+  const thrRaw = document.getElementById('f-therapist').value;
+  const custom = document.getElementById('f-custom-therapist').value.trim();
+  if(!name){ alert('Please enter patient name.'); return; }
+  if(!date){ alert('Please select a payment date.'); return; }
+  if(!amount || isNaN(amount)){ alert('Please enter a valid amount.'); return; }
+  if(!fundRaw){ alert('Please select a health fund.'); return; }
+
+  const parts = fundRaw.split('|');
+  const fundName = parts[0], memberNo = parts[1];
+  const tparts = thrRaw.split('|');
+  const thrName = tparts[0], thrCode = tparts[1];
+  const finalThr = thrName === 'Custom' ? (custom || 'Therapist') : thrName;
+  const displayDate = new Date(date + 'T00:00:00').toLocaleDateString('en-AU', {day:'2-digit', month:'2-digit', year:'numeric'});
+
+  let receiptNo;
+  if(API_URL){
+    try{
+      setSync('loading','Saving...');
+      const nr = await apiCall({action:'nextno', fundName:fundName, therapistCode:thrCode});
+      receiptNo = nr.receiptNo;
+      await apiCall({action:'add', receiptNo:receiptNo, date:displayDate, patientName:name, fundName:fundName, memberNo:memberNo, amount:amount, therapistName:finalThr, therapistCode:thrCode, itemCode:itemCode, service:service});
+      setSync('on','Synced');
+    }catch(e){
+      alert('Could not save to Google Sheet: ' + e.message);
+      receiptNo = localNextNo(fundName, thrCode);
+      setSync('off','Offline');
+    }
+  } else {
+    receiptNo = localNextNo(fundName, thrCode);
+  }
+
+  document.getElementById('receipt-wrapper').innerHTML = buildReceiptHTML({name:name, date:displayDate, amount:amount, fundName:fundName, memberNo:memberNo, therapistName:finalThr, receiptNo:receiptNo, therapistCode:thrCode, itemCode:itemCode, service:service});
+  refreshHistory();
+}
+
+function localNextNo(fundName, thrCode){
+  const prefix = '#' + (thrCode || 'XX').toUpperCase() + (fundName || 'XX').replace(/\s/g,'').toUpperCase().slice(0,2);
+  const count = cachedReceipts.filter(function(r){ return String(r.receiptNo).indexOf(prefix) === 0; }).length;
+  return prefix + String(count + 1).padStart(2,'0');
+}
+
+function buildReceiptHTML(d){
+  const svc = d.service || 'Remedial Massage';
+  const code = d.itemCode || '205';
+  const amtFmt = '$' + Number(d.amount).toFixed(2);
+  const isTanny = d.therapistCode === 'TD';
+  const sigContent = isTanny
+    ? '<div style="font-family:\'Brush Script MT\',cursive;font-size:26px;color:#2C2A22;margin-top:4px;">Tanhatai Dangam</div>'
+    : '<div style="border-bottom:1px solid #aaa;width:150px;height:44px;"></div>';
+  return '' +
+  '<div id="receipt" style="padding:1.75rem;font-size:13px;color:#222;font-family:Arial,sans-serif;">' +
+    '<table style="width:100%;margin-bottom:1.25rem;"><tr>' +
+      '<td style="vertical-align:top;">' +
+        '<div style="font-size:15px;font-weight:700;color:#2C2A22;line-height:1.3;">Natural Thai Massage &amp; Skincare</div>' +
+        '<div style="color:#666;line-height:1.75;font-size:11.5px;margin-top:3px;">147 Church Street, Brighton VIC 3186<br>(03) 9553 8399<br>www.naturalthaimassageskincare.com.au<br>ABN: 19 687 794 476</div>' +
+      '</td>' +
+      '<td style="text-align:right;vertical-align:top;width:88px;">' +
+        '<div style="width:60px;height:60px;background:#5C3410;border-radius:50%;margin-left:auto;display:flex;align-items:center;justify-content:center;border:3px solid #3D2008;box-shadow:0 0 0 2px #A0601E;color:#fff;font-weight:700;font-size:16px;">NT</div>' +
+      '</td>' +
+    '</tr></table>' +
+    '<div style="font-size:21px;font-weight:700;color:#2C2A22;margin-bottom:1.1rem;border-bottom:2px solid #B8963E;padding-bottom:0.4rem;">Receipt</div>' +
+    '<table style="width:100%;margin-bottom:1.1rem;font-size:12px;"><tr>' +
+      '<td style="width:40%;vertical-align:top;padding-right:0.75rem;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#B8963E;margin-bottom:3px;">BILL FROM</div><div style="border-top:1px solid #DDD;padding-top:5px;line-height:1.7;">Natural Thai Massage &amp; Skincare<br>147 Church Street, Brighton<br>VIC 3186<br>ABN: 19 687 794 476</div></td>' +
+      '<td style="width:33%;vertical-align:top;padding-right:0.75rem;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#B8963E;margin-bottom:3px;">BILL TO</div><div style="border-top:1px solid #DDD;padding-top:5px;font-weight:600;font-size:13px;">' + escHtml(d.name) + '</div></td>' +
+      '<td style="width:27%;vertical-align:top;text-align:right;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#B8963E;margin-bottom:3px;text-align:right;">RECEIPT NO</div><div style="border-top:1px solid #DDD;padding-top:5px;font-weight:700;color:#2C2A22;">' + escHtml(d.receiptNo) + '</div><div style="margin-top:3px;font-size:11.5px;"><span style="color:#666;">Payment Date:</span> <strong>' + escHtml(d.date) + '</strong></div></td>' +
+    '</tr></table>' +
+    '<div style="background:#F9F7F3;border-radius:4px;padding:0.65rem 0.9rem;margin-bottom:1.1rem;font-size:12px;line-height:1.85;"><div><strong>Remedial massage Therapist Name:</strong> ' + escHtml(d.therapistName) + '</div><div><strong>Provider:</strong> ' + escHtml(d.fundName) + '</div><div><strong>Membership Number:</strong> ' + escHtml(d.memberNo) + '</div></div>' +
+    '<table style="width:100%;border-collapse:collapse;margin-bottom:1.4rem;font-size:12px;"><thead><tr style="background:#2C2A22;color:#fff;"><th style="padding:7px 8px;text-align:center;width:60px;">CODE</th><th style="padding:7px 10px;text-align:left;">DESCRIPTION</th><th style="padding:7px 8px;text-align:center;width:45px;">QTY</th><th style="padding:7px 8px;text-align:right;width:70px;">UNIT</th><th style="padding:7px 8px;text-align:right;width:75px;">TOTAL</th></tr></thead><tbody><tr style="border-bottom:1px solid #EEE;"><td style="padding:9px 8px;text-align:center;">' + escHtml(code) + '</td><td style="padding:9px 10px;">' + escHtml(svc) + ' (' + escHtml(code) + ')</td><td style="padding:9px 8px;text-align:center;">1</td><td style="padding:9px 8px;text-align:right;">' + amtFmt + '</td><td style="padding:9px 8px;text-align:right;font-weight:600;">' + amtFmt + '</td></tr></tbody></table>' +
+    '<table style="width:100%;"><tr>' +
+      '<td style="vertical-align:bottom;width:55%;"><div style="font-size:11px;color:#666;margin-bottom:2px;">Therapist Signature</div>' + sigContent + '</td>' +
+      '<td style="vertical-align:bottom;text-align:right;"><table style="margin-left:auto;font-size:12px;"><tr><td style="padding:4px 14px 4px 0;color:#666;font-weight:600;">PAID IN FULL</td><td style="padding:4px 0;font-weight:700;font-size:14px;color:#2C2A22;">' + amtFmt + '</td></tr><tr><td style="padding:4px 14px 4px 0;color:#666;font-weight:600;">TOTAL BALANCE</td><td style="padding:4px 0;font-weight:700;font-size:14px;color:#2C2A22;">$0.00</td></tr></table></td>' +
+    '</tr></table>' +
+    '<div style="text-align:center;font-style:italic;color:#B8963E;font-size:12px;margin-top:1.4rem;border-top:1px solid #EEE;padding-top:0.9rem;">Thank you for choosing Natural Thai Massage &amp; Skin Care.<br>We look forward to welcoming you again soon.</div>' +
+  '</div>';
+}
+
+function printReceipt(){ if(!document.getElementById('receipt')){ alert('Please generate a receipt first.'); return; } window.print(); }
+
+function renderHistory(list){
+  const el = document.getElementById('history-list');
+  document.getElementById('hist-count').textContent = list.length ? ('(' + list.length + ')') : '';
+  if(!list.length){ el.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);padding:0.25rem 0;">' + (API_URL ? 'No receipts yet.' : 'Connect Google Sheet to see receipts.') + '</div>'; return; }
+  el.innerHTML = list.slice(0,30).map(function(r){
+    return '<div class="history-item" onclick=\'loadReceipt(' + JSON.stringify(JSON.stringify(r)) + ')\'>' +
+      '<div><span class="badge-fund">' + escHtml(r.fundName) + '</span><span style="margin-left:6px;font-weight:600;">' + escHtml(r.patientName) + '</span><br><span style="color:var(--muted)">' + escHtml(r.receiptNo) + ' - ' + escHtml(r.date) + ' - $' + Number(r.amount).toFixed(2) + '</span></div>' +
+      '<button class="del-btn" onclick=\'event.stopPropagation();deleteReceipt(' + JSON.stringify(JSON.stringify(r.receiptNo)) + ')\'>&#x2715;</button>' +
+    '</div>';
+  }).join('');
+}
+
+function loadReceipt(json){
+  const r = JSON.parse(json);
+  document.getElementById('receipt-wrapper').innerHTML = buildReceiptHTML({name:r.patientName, date:r.date, amount:r.amount, fundName:r.fundName, memberNo:r.memberNo, therapistName:r.therapistName, receiptNo:r.receiptNo, therapistCode:r.therapistCode, itemCode:r.itemCode, service:r.service});
+}
+
+async function deleteReceipt(json){
+  const receiptNo = JSON.parse(json);
+  if(!confirm('Delete receipt ' + receiptNo + '?')) return;
+  if(API_URL){
+    try{ setSync('loading','Deleting...'); await apiCall({action:'delete', receiptNo:receiptNo}); setSync('on','Synced'); }
+    catch(e){ alert('Could not delete: ' + e.message); setSync('off','Offline'); }
+  }
+  refreshHistory();
+}
+
+function toggleFundPanel(){
+  const p = document.getElementById('fund-panel');
+  const b = document.getElementById('fund-toggle-btn');
+  const open = p.style.display === 'none';
+  p.style.display = open ? 'block' : 'none';
+  b.textContent = open ? 'Hide' : '+ Manage / add funds';
+  if(open) renderCustomFundList();
+}
+function toggleCustomTherapist(){
+  const v = document.getElementById('f-therapist').value;
+  document.getElementById('custom-therapist-wrap').classList.toggle('d-none', v.indexOf('Custom') !== 0);
+}
+function toggleSettings(){
+  const p = document.getElementById('settings-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('api-url').value = API_URL;
+}
+function saveApiUrl(){
+  const url = document.getElementById('api-url').value.trim();
+  API_URL = url;
+  localStorage.setItem(API_KEY, url);
+  document.getElementById('settings-panel').style.display = 'none';
+  refreshHistory();
+}
+
+document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+rebuildFundSelect();
+refreshHistory();
+</script>
+</body>
+</html>
