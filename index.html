@@ -44,7 +44,7 @@ body{background:#F9F7F3;font-family:'Segoe UI',system-ui,sans-serif;color:var(--
 .fund-row .fund-name{font-weight:700;min-width:150px;flex:1}.fund-row .fund-num-input{width:130px;font-size:.8rem;padding:3px 6px;border:1px solid var(--border);border-radius:5px;color:var(--gold);font-weight:800;background:#fffdf6}
 .fund-row .fund-del{background:none;border:none;color:#c0392b;cursor:pointer;font-size:1rem}.fund-group-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin:10px 0 4px 2px}
 .add-fund-row{display:flex;gap:6px}.add-fund-row input{flex:1}.fund-panel-scroll{max-height:340px;overflow-y:auto;padding-right:4px}
-@media print{body *{visibility:hidden}#receipt,#receipt *{visibility:visible}#receipt{position:fixed;top:0;left:0;width:100%;margin:0;box-shadow:none;border-radius:0}}
+@media print{@page{size:A4;margin:8mm}html,body{margin:0!important;padding:0!important;background:#fff!important}body *{visibility:hidden}#receipt,#receipt *{visibility:visible}#receipt{position:absolute;top:0;left:0;right:0;width:100%;margin:0;padding:6mm 5mm!important;box-shadow:none;border-radius:0;font-size:11.5px!important}#receipt table{page-break-inside:avoid}}
 </style>
 </head>
 <body>
