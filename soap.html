@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Natural Thai · Client Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #FAF7F2;
+  --card:    #FFFFFF;
+  --border:  #E2D9CC;
+  --line:    #EDE6DB;
+  --muted:   #9A8F82;
+  --mid:     #6B5F52;
+  --ink:     #2C2419;
+  --gold:    #8B6914;
+  --gold-bg: #FDF5E4;
+  --green:   #3A6B45;
+  --green-bg:#EDF4EF;
+  --red:     #8B2A1A;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; font-size: 16px; line-height: 1.5; }
+
+/* SHELL */
+.shell { max-width: 520px; margin: 0 auto; }
+
+/* HEADER */
+.header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250,247,242,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 20px 16px;
+}
+.header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.brand { display: flex; flex-direction: column; gap: 2px; }
+.brand-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--ink); letter-spacing: 0.04em; }
+.brand-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.btn-add {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--ink); border: none;
+  color: #fff; font-size: 26px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: opacity 0.2s;
+}
+.btn-add:active { opacity: 0.75; }
+
+/* SEARCH */
+.search-wrap { position: relative; }
+.search-wrap input {
+  width: 100%; background: var(--card);
+  border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 12px 16px 12px 44px;
+  font-family: 'Inter', sans-serif; font-size: 16px; color: var(--ink);
+  outline: none; transition: border-color 0.2s;
+}
+.search-wrap input::placeholder { color: var(--muted); }
+.search-wrap input:focus { border-color: var(--gold); }
+.si { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; pointer-events: none; }
+
+/* LIST */
+.list-pad { padding-bottom: 100px; }
+.sec-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); padding: 16px 20px 8px;
+}
+.client-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer; background: var(--card);
+  transition: background 0.15s;
+}
+.client-row:first-child { border-top: 1px solid var(--line); }
+.client-row:active { background: var(--gold-bg); }
+.avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--gold-bg); border: 1.5px solid var(--border);
+  color: var(--gold); font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ci { flex: 1; min-width: 0; }
+.cname { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.csub { font-size: 13px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vbadge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); background: var(--green-bg); border-radius: 20px; padding: 3px 10px; flex-shrink: 0; font-weight: 500; }
+
+.empty { padding: 60px 20px; text-align: center; }
+.empty-h { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; color: var(--muted); margin-bottom: 6px; }
+.empty-s { font-size: 15px; color: var(--muted); }
+
+/* SYNC */
+.sync-bar {
+  position: fixed; bottom: 0; width: 100%; max-width: 520px;
+  background: var(--card); border-top: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
+}
+.sdot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.sdot.loading { background: var(--gold); animation: blink 1s infinite; }
+.sdot.error { background: var(--red); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+/* PANELS */
+.panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; }
+.panel.open { display: block; }
+.pbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(250,247,242,0.96); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px; display: flex; align-items: center; gap: 14px;
+}
+.btn-back { background: none; border: none; cursor: pointer; color: var(--gold); font-size: 24px; padding: 0; line-height: 1; display: flex; align-items: center; }
+.ptitle { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink); flex: 1; }
+
+/* HERO */
+.hero { padding: 28px 20px 24px; border-bottom: 1px solid var(--border); background: var(--card); }
+.hero-name { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; color: var(--ink); line-height: 1.1; margin-bottom: 16px; }
+.hero-name em { font-style: italic; color: var(--gold); }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mk { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.mv { font-size: 15px; color: var(--ink); }
+
+/* ACTIONS */
+.astrip { display: flex; gap: 10px; padding: 16px 20px; background: var(--card); border-bottom: 1px solid var(--border); }
+.btn-soap { flex: 1; padding: 14px; background: var(--ink); border: none; border-radius: 10px; color: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: opacity 0.2s; }
+.btn-soap:active { opacity: 0.8; }
+.btn-rcpt { padding: 14px 18px; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; color: var(--mid); font-family: 'Inter', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btn-rcpt:active { border-color: var(--gold); color: var(--gold); }
+
+/* HISTORY */
+.hist-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 18px 20px 10px; }
+.soap-card { margin: 0 16px 12px; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card); }
+.soap-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid transparent; transition: background 0.15s; }
+.soap-head:active { background: var(--gold-bg); }
+.sdate { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); font-weight: 500; }
+.ssnip { font-size: 14px; color: var(--muted); font-style: italic; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sbody { padding: 16px; display: none; border-top: 1px solid var(--line); }
+.sbody.open { display: block; }
+.ssec { margin-bottom: 16px; }
+.ssec:last-child { margin-bottom: 0; }
+.sk { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 4px; font-weight: 500; }
+.sv { font-size: 15px; color: var(--ink); line-height: 1.65; }
+
+/* FORMS */
+.fbody { padding: 24px 20px 80px; }
+.field { margin-bottom: 18px; }
+.flabel { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
+.flabel.soap { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; letter-spacing: 0; text-transform: none; color: var(--green); font-weight: 600; }
+.field input, .field textarea {
+  width: 100%; background: var(--card);
+  border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 13px 15px; font-family: 'Inter', sans-serif;
+  font-size: 16px; color: var(--ink); outline: none;
+  transition: border-color 0.2s; -webkit-appearance: none;
+}
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+.field input:focus, .field textarea:focus { border-color: var(--gold); }
+.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; }
+.divider { height: 1px; background: var(--border); margin: 22px 0; }
+.stitle { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; color: var(--muted); margin-bottom: 18px; }
+
+/* UPLOAD */
+.uzone { border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px; text-align: center; cursor: pointer; margin-bottom: 14px; background: var(--card); transition: border-color 0.2s; }
+.uzone:active { border-color: var(--gold); }
+.uzone.filled { border-style: solid; border-color: var(--gold); padding: 12px; }
+.uzone.filled img { width: 100%; border-radius: 8px; }
+.uico { font-size: 32px; margin-bottom: 8px; }
+.utxt { font-size: 15px; color: var(--muted); }
+.uhint { font-size: 13px; color: var(--muted); opacity: 0.7; margin-top: 4px; }
+
+.btn-ai {
+  width: 100%; padding: 14px;
+  background: var(--gold-bg); border: 1.5px solid var(--gold);
+  border-radius: 10px; color: var(--gold);
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px;
+  cursor: pointer; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.2s;
+}
+.btn-ai:active:not(:disabled) { background: var(--gold); color: #fff; }
+.btn-ai:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ai-msg { border-radius: 10px; padding: 13px 16px; font-size: 15px; margin-bottom: 14px; display: none; }
+.ai-msg.ok { background: var(--green-bg); border: 1.5px solid var(--green); color: var(--green); }
+.ai-msg.err { background: #FDF0EE; border: 1.5px solid #C0392B; color: #8B2A1A; }
+
+.btn-save {
+  width: 100%; padding: 16px;
+  background: var(--ink); border: none; border-radius: 10px;
+  color: #fff; font-family: 'Inter', sans-serif;
+  font-weight: 600; font-size: 17px; cursor: pointer;
+  margin-top: 10px; transition: opacity 0.2s;
+}
+.btn-save:active:not(:disabled) { opacity: 0.8; }
+.btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* SPINNER */
+.spin { width: 18px; height: 18px; border: 2.5px solid rgba(139,105,20,0.25); border-top-color: var(--gold); border-radius: 50%; animation: rot 0.7s linear infinite; display: none; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast { position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%) translateY(14px); background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 24px; font-size: 15px; font-weight: 500; opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 999; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+    <div class="header-row">
+      <div class="brand">
+        <div class="brand-name">Natural Thai</div>
+        <div class="brand-sub">Clinical Notes</div>
+      </div>
+      <button class="btn-add" onclick="openNewClient()">+</button>
+    </div>
+    <div class="search-wrap">
+      <span class="si">⌕</span>
+      <input type="search" id="searchInput" placeholder="Search clients…" oninput="renderList()" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="list-pad">
+    <div class="sec-label">All Clients</div>
+    <div id="clientList"></div>
+  </div>
+
+  <div class="sync-bar">
+    <div class="sdot loading" id="syncDot"></div>
+    <span id="syncText">Connecting to Google Sheets…</span>
+  </div>
+</div>
+
+<!-- PANEL: DETAIL -->
+<div class="panel" id="panelClient">
+  <div class="pbar">
+    <button class="btn-back" onclick="closePanel('panelClient')">←</button>
+    <div class="ptitle" id="detailTitle"></div>
+  </div>
+  <div class="hero">
+    <div class="hero-name" id="heroName"></div>
+    <div class="meta-grid" id="metaGrid"></div>
+  </div>
+  <div class="astrip">
+    <button class="btn-soap" onclick="openSOAP()">+ Add SOAP Note</button>
+    <button class="btn-rcpt" onclick="goReceipt()">🧾 Receipt</button>
+  </div>
+  <div class="hist-label">Visit History</div>
+  <div id="soapList" style="padding-bottom:48px"></div>
+</div>
+
+<!-- PANEL: NEW CLIENT -->
+<div class="panel" id="panelNewClient">
+  <div class="pbar">
+    <button class="btn-back" onclick="closePanel('panelNewClient')">←</button>
+    <div class="ptitle">New Client</div>
+  </div>
+  <div class="fbody">
+    <div class="uzone" id="uploadZone" onclick="document.getElementById('fileIn').click()">
+      <div class="uico">📋</div>
+      <div class="utxt">Tap to upload intake form photo</div>
+      <div class="uhint">AI reads client details automatically</div>
+    </div>
+    <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="handleImg(event)">
+    <div class="ai-msg" id="aiMsg"></div>
+    <button class="btn-ai" id="btnAI" onclick="readForm()" disabled>
+      <div class="spin" id="aiSpin"></div>
+      <span id="btnAITxt">Read form with AI</span>
+    </button>
+    <div class="divider"></div>
+    <div class="stitle">Client Details</div>
+    <div class="field"><label class="flabel">Full Name *</label><input id="nc-name" placeholder="Charlotte Eccleston"></div>
+    <div class="field"><label class="flabel">Phone</label><input id="nc-phone" placeholder="+61 456 809 780"></div>
+    <div class="field"><label class="flabel">Email</label><input id="nc-email" type="email" placeholder="name@email.com"></div>
+    <div class="field"><label class="flabel">Health Fund</label><input id="nc-fund" placeholder="Medibank"></div>
+    <div class="field"><label class="flabel">Date of Birth</label><input id="nc-dob" placeholder="May 7, 2001"></div>
+    <div class="field"><label class="flabel">Address</label><input id="nc-address" placeholder="Roslyn St Brighton"></div>
+    <div class="field"><label class="flabel">Occupation</label><input id="nc-occ" placeholder="Business"></div>
+    <div class="field"><label class="flabel">Medical History</label><input id="nc-med" placeholder="None"></div>
+    <div class="field"><label class="flabel">Current Medications</label><input id="nc-meds" placeholder="Birth control"></div>
+    <button class="btn-save" id="btnSaveClient" onclick="saveClient()">Save Client</button>
+  </div>
+</div>
+
+<!-- PANEL: SOAP -->
+<div class="panel" id="panelSOAP">
+  <div class="pbar">
+    <button class="btn-back" onclick="closePanel('panelSOAP')">←</button>
+    <div class="ptitle">SOAP Note</div>
+  </div>
+  <div class="fbody">
+    <div class="field"><label class="flabel">Date</label><input type="date" id="soap-date"></div>
+    <div class="divider"></div>
+    <div class="field"><label class="flabel soap">S — Subjective</label><textarea id="soap-s" placeholder="Patient reports…"></textarea></div>
+    <div class="field"><label class="flabel soap">O — Objective</label><textarea id="soap-o" placeholder="Findings on assessment…"></textarea></div>
+    <div class="field"><label class="flabel soap">A — Assessment</label><textarea id="soap-a" placeholder="Clinical impression…"></textarea></div>
+    <div class="field"><label class="flabel soap">P — Plan</label><textarea id="soap-p" placeholder="Treatment plan…"></textarea></div>
+    <button class="btn-save" id="btnSaveSOAP" onclick="saveSOAP()">Save Note</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT = 'https://script.google.com/macros/s/AKfycbzDajS1o3RJ96XWjT1iFzpK47tJYqyA3X-8kEVj0I_niaxsNoMOx40-tYnd67Cmqc39/exec';
+const RECEIPT = 'https://tanhataidangaem-bot.github.io/receiptgenerator/';
+let clients=[], currentId=null, imgB64=null;
+
+function sheetCall(p) {
+  return new Promise((res,rej)=>{
+    const cb='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const url=SCRIPT+'?'+new URLSearchParams({...p,callback:cb});
+    const s=document.createElement('script');
+    window[cb]=d=>{delete window[cb];s.remove();res(d);};
+    s.onerror=()=>{delete window[cb];s.remove();rej(new Error('Network error'));};
+    s.src=url; document.head.appendChild(s);
+    setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error('Timeout'));}},15000);
+  });
+}
+
+function setSync(state,msg){
+  const d=document.getElementById('syncDot');
+  d.className='sdot'+(state==='loading'?' loading':state==='error'?' error':'');
+  document.getElementById('syncText').textContent=msg;
+}
+
+async function loadClients(){
+  setSync('loading','Syncing with Google Sheets…');
+  try{
+    const r=await sheetCall({action:'getClients'});
+    if(r.ok){clients=r.clients||[];setSync('ok',clients.length+' client'+(clients.length!==1?'s':'')+' · synced');}
+    else throw new Error(r.error);
+  }catch(e){setSync('error','Connection failed');showToast('Could not connect to Sheets');}
+  renderList();
+}
+
+function renderList(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  let list=clients.filter(c=>!q||(c.Name||'').toLowerCase().includes(q));
+  list.sort((a,b)=>(a.Name||'').localeCompare(b.Name||''));
+  const el=document.getElementById('clientList');
+  if(!list.length){
+    el.innerHTML='<div class="empty"><div class="empty-h">'+(q?'No results':'No clients yet')+'</div><div class="empty-s">'+(q?'Try a different name':'Tap + to add your first client')+'</div></div>';
+    return;
+  }
+  el.innerHTML=list.map(c=>{
+    const ini=(c.Name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const sub=[c.Phone,c['Health Fund']].filter(Boolean).join(' · ')||'';
+    return '<div class="client-row" onclick="openClient(\''+c.ID+'\')">'+
+      '<div class="avatar">'+ini+'</div>'+
+      '<div class="ci"><div class="cname">'+(c.Name||'—')+'</div>'+
+      (sub?'<div class="csub">'+sub+'</div>':'')+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+async function openClient(id){
+  currentId=id;
+  const c=clients.find(x=>x.ID===id)||{};
+  document.getElementById('detailTitle').textContent=c.Name||'Client';
+  const parts=(c.Name||'').split(' ');const last=parts.pop();const first=parts.join(' ');
+  document.getElementById('heroName').innerHTML=first?first+' <em>'+last+'</em>':'<em>'+last+'</em>';
+  const fs=[['Phone',c.Phone],['Health Fund',c['Health Fund']],['Email',c.Email],['Date of Birth',c.DOB],['Address',c.Address],['Occupation',c.Occupation],['Medical History',c.Medical],['Medications',c.Meds]].filter(([,v])=>v);
+  document.getElementById('metaGrid').innerHTML=fs.map(([k,v])=>'<div><div class="mk">'+k+'</div><div class="mv">'+v+'</div></div>').join('');
+  openPanel('panelClient');
+  document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted);font-size:15px">Loading visits…</div>';
+  try{const r=await sheetCall({action:'getVisits',clientId:id});renderVisits(r.visits||[]);}
+  catch(e){document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted)">Could not load visits</div>';}
+}
+
+function renderVisits(visits){
+  const el=document.getElementById('soapList');
+  if(!visits.length){el.innerHTML='<div style="padding:28px 20px;color:var(--muted);font-size:15px;font-style:italic">No visit notes yet</div>';return;}
+  visits.sort((a,b)=>(b.Date||'').localeCompare(a.Date||''));
+  el.innerHTML=visits.map((v,i)=>
+    '<div class="soap-card">'+
+    '<div class="soap-head" onclick="tv('+i+')">'+
+    '<span class="sdate">'+fmtDate(v.Date)+'</span>'+
+    '<span class="ssnip">'+(v.S||'—').slice(0,48)+'</span></div>'+
+    '<div class="sbody" id="sb'+i+'">'+
+    (v.S?'<div class="ssec"><div class="sk">Subjective</div><div class="sv">'+v.S+'</div></div>':'')+
+    (v.O?'<div class="ssec"><div class="sk">Objective</div><div class="sv">'+v.O+'</div></div>':'')+
+    (v.A?'<div class="ssec"><div class="sk">Assessment</div><div class="sv">'+v.A+'</div></div>':'')+
+    (v.P?'<div class="ssec"><div class="sk">Plan</div><div class="sv">'+v.P+'</div></div>':'')+
+    '</div></div>'
+  ).join('');
+}
+
+function tv(i){document.getElementById('sb'+i).classList.toggle('open');}
+function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return(d&&m&&y)?d+'/'+m+'/'+y.slice(2):s;}
+function goReceipt(){const c=clients.find(x=>x.ID===currentId)||{};window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');}
+function openPanel(id){document.getElementById(id).classList.add('open');}
+function closePanel(id){document.getElementById(id).classList.remove('open');}
+
+function openNewClient(){
+  imgB64=null;
+  document.getElementById('uploadZone').className='uzone';
+  document.getElementById('uploadZone').innerHTML='<div class="uico">📋</div><div class="utxt">Tap to upload intake form photo</div><div class="uhint">AI reads client details automatically</div>';
+  document.getElementById('btnAI').disabled=true;
+  document.getElementById('aiMsg').style.display='none';
+  ['nc-name','nc-phone','nc-email','nc-fund','nc-dob','nc-address','nc-occ','nc-med','nc-meds'].forEach(id=>document.getElementById(id).value='');
+  openPanel('panelNewClient');
+}
+
+function handleImg(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    imgB64=ev.target.result.split(',')[1];
+    const z=document.getElementById('uploadZone');
+    z.className='uzone filled';
+    z.innerHTML='<img src="'+ev.target.result+'" alt="form">';
+    document.getElementById('btnAI').disabled=false;
+  };
+  r.readAsDataURL(f);
+}
+
+async function readForm(){
+  if(!imgB64)return;
+  const btn=document.getElementById('btnAI'),spin=document.getElementById('aiSpin'),txt=document.getElementById('btnAITxt'),msg=document.getElementById('aiMsg');
+  btn.disabled=true;spin.style.display='block';txt.textContent='Reading…';msg.style.display='none';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imgB64}},
+        {type:'text',text:'Extract client information from this massage intake form. Return ONLY valid JSON: {"name":"","phone":"","email":"","dob":"","address":"","fund":"","occupation":"","medical":"","meds":""}'}
+      ]}]})
+    });
+    const data=await res.json();
+    const raw=data.content?.find(b=>b.type==='text')?.text||'';
+    const info=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    if(info.name)document.getElementById('nc-name').value=info.name;
+    if(info.phone)document.getElementById('nc-phone').value=info.phone;
+    if(info.email)document.getElementById('nc-email').value=info.email;
+    if(info.fund)document.getElementById('nc-fund').value=info.fund;
+    if(info.dob)document.getElementById('nc-dob').value=info.dob;
+    if(info.address)document.getElementById('nc-address').value=info.address;
+    if(info.occupation)document.getElementById('nc-occ').value=info.occupation;
+    if(info.medical)document.getElementById('nc-med').value=info.medical;
+    if(info.meds)document.getElementById('nc-meds').value=info.meds;
+    msg.className='ai-msg ok';msg.textContent='✓ Details filled — review and save';msg.style.display='block';
+    showToast('Form read successfully');
+  }catch(e){msg.className='ai-msg err';msg.textContent='✗ Could not read form — fill in manually';msg.style.display='block';}
+  btn.disabled=false;spin.style.display='none';txt.textContent='Read again';
+}
+
+async function saveClient(){
+  const name=document.getElementById('nc-name').value.trim();
+  if(!name){showToast('Name is required');return;}
+  const btn=document.getElementById('btnSaveClient');
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const r=await sheetCall({action:'addClient',name,phone:document.getElementById('nc-phone').value.trim(),email:document.getElementById('nc-email').value.trim(),fund:document.getElementById('nc-fund').value.trim(),dob:document.getElementById('nc-dob').value.trim(),address:document.getElementById('nc-address').value.trim(),occupation:document.getElementById('nc-occ').value.trim(),medical:document.getElementById('nc-med').value.trim(),meds:document.getElementById('nc-meds').value.trim()});
+    if(r.ok){showToast(name+' saved');closePanel('panelNewClient');await loadClients();}
+    else throw new Error(r.error);
+  }catch(e){showToast('Save failed — try again');}
+  btn.disabled=false;btn.textContent='Save Client';
+}
+
+function openSOAP(){
+  document.getElementById('soap-date').value=new Date().toISOString().split('T')[0];
+  ['soap-s','soap-o','soap-a','soap-p'].forEach(id=>document.getElementById(id).value='');
+  openPanel('panelSOAP');
+}
+
+async function saveSOAP(){
+  const c=clients.find(x=>x.ID===currentId)||{};
+  const s=document.getElementById('soap-s').value.trim(),o=document.getElementById('soap-o').value.trim(),a=document.getElementById('soap-a').value.trim(),p=document.getElementById('soap-p').value.trim();
+  if(!s&&!o&&!a&&!p){showToast('Fill in at least one field');return;}
+  const btn=document.getElementById('btnSaveSOAP');
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const r=await sheetCall({action:'addVisit',clientId:currentId,clientName:c.Name||'',date:document.getElementById('soap-date').value,s,o,a,p});
+    if(r.ok){showToast('SOAP note saved');closePanel('panelSOAP');openClient(currentId);}
+    else throw new Error(r.error);
+  }catch(e){showToast('Save failed — try again');}
+  btn.disabled=false;btn.textContent='Save Note';
+}
+
+let tt;
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500);}
+
+loadClients();
+</script>
+</body>
+</html>
