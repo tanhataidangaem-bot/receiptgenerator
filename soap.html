@@ -154,6 +154,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
 .soap-preview-box{background:var(--card);border:1.5px solid var(--green-border);border-radius:12px;padding:16px;margin-bottom:16px;}
 .soap-preview-box pre{font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;white-space:pre-wrap;color:var(--ink);}
 
+/* PRESSURE */
+.pressure-btn{flex:1;padding:11px 6px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--mid);cursor:pointer;transition:all 0.15s;text-align:center;}
+.pressure-btn.selected{background:var(--gold-bg);border-color:var(--gold-border);color:var(--gold);}
+
 /* TOAST */
 .toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-size:15px;font-weight:500;opacity:0;transition:all 0.25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.18);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -246,6 +250,42 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
   </div>
   <div class="fbody">
     <div class="field"><label class="flabel">Date</label><input type="date" id="soap-date"></div>
+
+    <!-- CLINICAL FIELDS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+      <div class="field" style="margin:0">
+        <label class="flabel">Treatment Type</label>
+        <select id="soap-type" style="width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);outline:none;-webkit-appearance:none;">
+          <option value="Subsequent">Subsequent</option>
+          <option value="Initial">Initial</option>
+        </select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="flabel">Duration</label>
+        <select id="soap-duration" style="width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);outline:none;-webkit-appearance:none;">
+          <option value="30 min">30 min</option>
+          <option value="45 min">45 min</option>
+          <option value="60 min" selected>60 min</option>
+          <option value="90 min">90 min</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- PRESSURE -->
+    <div style="margin-bottom:18px;">
+      <label class="flabel">Pressure</label>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="pressure-btn" onclick="setPressure('Light')" id="pr-Light">🌿 Light</button>
+        <button type="button" class="pressure-btn" onclick="setPressure('Medium')" id="pr-Medium">💪 Medium</button>
+        <button type="button" class="pressure-btn selected" onclick="setPressure('Firm')" id="pr-Firm">🔥 Firm</button>
+      </div>
+    </div>
+
+    <!-- COPY FROM LAST -->
+    <div id="copyLastWrap" style="display:none;margin-bottom:16px;">
+      <button type="button" onclick="copyLastSOAP()" style="width:100%;padding:12px;background:var(--blue-bg);border:1.5px solid #6B9FD4;border-radius:12px;color:var(--blue);font-family:'Inter',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">📋 Copy from last visit</button>
+    </div>
+
     <div class="divider"></div>
 
     <!-- STEP 1: BODY PARTS -->
@@ -285,6 +325,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
       <div class="field"><label class="flabel soap">O — Objective</label><textarea id="soap-o" rows="3"></textarea></div>
       <div class="field"><label class="flabel soap">A — Assessment</label><textarea id="soap-a" rows="2"></textarea></div>
       <div class="field"><label class="flabel soap">P — Plan</label><textarea id="soap-p" rows="4"></textarea></div>
+      <div class="field" style="margin-top:16px;">
+        <label class="flabel">📝 Private Note (not in SOAP)</label>
+        <textarea id="soap-note" rows="2" placeholder="e.g. client seemed stressed, prefers no talking, follow up shoulder next visit…" style="font-size:14px;"></textarea>
+      </div>
       <button class="btn-save" id="btnSaveSOAP" onclick="saveSOAP()">Save Note</button>
     </div>
 
@@ -307,7 +351,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
 
 <script>
 // ── DATA ─────────────────────────────────────
-const SCRIPT='https://script.google.com/macros/s/AKfycbxn2IGbq_USTCgq3EGck0X6O5mG-Y_TQ0O_7iXhbSk6DigkP3CslHSSERS1ZL50eVWf/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycbxfmiPLQv7onXNzY3V1PaUObcwsH2Y5m7sbRHc4H9h2k8ihHcmAANZgJeyOaobBT89l/exec';
 const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
 
 // BODY PARTS + MUSCLES
@@ -396,12 +440,14 @@ function renderVisits(visits){
   visits.sort((a,b)=>(b.Date||'').localeCompare(a.Date||''));
   // store for editing
   window._currentVisits=visits;
-  el.innerHTML=visits.map((v,i)=>
-    '<div class="soap-card">'+
+  el.innerHTML=visits.map((v,i)=>{
+    const badges=[v['Treatment Type']||v.TreatmentType||'',v.Duration||'',v.Pressure?v.Pressure+' pressure':''].filter(Boolean);
+    return '<div class="soap-card">'+
     '<div class="soap-head" onclick="tv('+i+')">'+
-    '<span class="sdate">'+(v.Date?fmtDateFull(v.Date):'No date')+'</span>'+
+    '<div><span class="sdate">'+(v.Date?fmtDateFull(v.Date):'No date')+'</span>'+
+    (badges.length?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;">'+badges.map(b=>'<span style="font-family:JetBrains Mono,monospace;font-size:10px;background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold);border-radius:10px;padding:2px 8px;">'+b+'</span>').join('')+'</div>':'')+
+    '</div>'+
     '<div class="shead-right">'+
-    '<span class="ssnip">'+(v.S||'—').slice(0,40)+'</span>'+
     '<button class="btn-edit-soap" onclick="event.stopPropagation();editSOAP('+i+')">Edit</button>'+
     '</div></div>'+
     '<div class="sbody" id="sb'+i+'">'+
@@ -409,17 +455,32 @@ function renderVisits(visits){
     (v.O?'<div class="ssec"><div class="sk">O — Objective</div><div class="sv">'+escHtml(v.O)+'</div></div>':'')+
     (v.A?'<div class="ssec"><div class="sk">A — Assessment</div><div class="sv">'+escHtml(v.A)+'</div></div>':'')+
     (v.P?'<div class="ssec"><div class="sk">P — Plan</div><div class="sv">'+escHtml(v.P)+'</div></div>':'')+
-    '</div></div>'
-  ).join('');
+    (v['Private Note']||v.PrivateNote?'<div class="ssec" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)"><div class="sk" style="color:var(--muted)">📝 Private Note</div><div class="sv" style="color:var(--muted);font-style:italic;">'+escHtml(v['Private Note']||v.PrivateNote)+'</div></div>':'')+
+    '</div></div>';
+  }).join('');
 }
 
 function fmtDateFull(s){
   if(!s)return'—';
   try{
-    const [y,m,d]=s.split('-');
-    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return d+' '+months[parseInt(m)-1]+' '+y;
-  }catch(e){return s;}
+    // Handle Google Sheets date formats: "2026-07-04", "04/07/2026", or Date object string
+    let clean=String(s).trim();
+    // Remove time portion if present
+    if(clean.includes('T'))clean=clean.split('T')[0];
+    // Try YYYY-MM-DD
+    if(/^\d{4}-\d{2}-\d{2}$/.test(clean)){
+      const [y,m,d]=clean.split('-');
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return d+' '+months[parseInt(m,10)-1]+' '+y;
+    }
+    // Try DD/MM/YYYY
+    if(/^\d{2}\/\d{2}\/\d{4}$/.test(clean)){
+      const [d,m,y]=clean.split('/');
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return d+' '+months[parseInt(m,10)-1]+' '+y;
+    }
+    return clean;
+  }catch(e){return String(s);}
 }
 
 function tv(i){document.getElementById('sb'+i).classList.toggle('open');}
@@ -533,6 +594,26 @@ async function saveClient(){
 }
 
 // ── SOAP BUILDER ──────────────────────────────
+let selectedPressure='Firm';
+function setPressure(p){
+  selectedPressure=p;
+  ['Light','Medium','Firm'].forEach(x=>{
+    const b=document.getElementById('pr-'+x);
+    if(b)b.className='pressure-btn'+(x===p?' selected':'');
+  });
+}
+
+function copyLastSOAP(){
+  if(!window._currentVisits||!window._currentVisits.length)return;
+  const last=window._currentVisits[0]; // already sorted newest first
+  document.getElementById('soap-s').value=last.S||'';
+  document.getElementById('soap-o').value=last.O||'';
+  document.getElementById('soap-a').value=last.A||'';
+  document.getElementById('soap-p').value=last.P||'';
+  document.getElementById('soapPreviewWrap').style.display='block';
+  showToast('Copied from last visit — edit as needed');
+}
+
 function buildBPGrid(){
   const grid=document.getElementById('bpGrid');
   grid.innerHTML=Object.entries(BODY_MAP).map(([part,d])=>
@@ -640,6 +721,16 @@ function openSOAP(editMode,visitIdx){
   document.getElementById('soapPreviewWrap').style.display='none';
   document.getElementById('manualWrap').style.display='none';
   ['soap-s','soap-o','soap-a','soap-p','soap-sm','soap-om','soap-am','soap-pm','sym-extra'].forEach(id=>document.getElementById(id).value='');
+  setPressure('Firm');
+  document.getElementById('soap-type').value='Subsequent';
+  document.getElementById('soap-duration').value='60 min';
+  document.getElementById('soap-note').value='';
+
+  // Show copy last if visits exist
+  const copyWrap=document.getElementById('copyLastWrap');
+  if(window._currentVisits&&window._currentVisits.length>0&&!editMode){copyWrap.style.display='block';}
+  else{copyWrap.style.display='none';}
+
   buildBPGrid();
 
   if(editMode&&window._currentVisits&&window._currentVisits[visitIdx]){
@@ -669,7 +760,15 @@ async function saveSOAP(){
   try{
     const action=editingVisitIdx!==null?'updateVisit':'addVisit';
     const visitId=editingVisitIdx!==null&&window._currentVisits?window._currentVisits[editingVisitIdx].ID:'';
-    const r=await sheetCall({action,visitId,clientId:currentId,clientName:c.Name||'',date:document.getElementById('soap-date').value,s,o,a,p});
+    const r=await sheetCall({
+      action,visitId,clientId:currentId,clientName:c.Name||'',
+      date:document.getElementById('soap-date').value,
+      treatmentType:document.getElementById('soap-type').value,
+      duration:document.getElementById('soap-duration').value,
+      pressure:selectedPressure,
+      s,o,a,p,
+      privateNote:document.getElementById('soap-note').value.trim()
+    });
     if(r.ok){showToast(editingVisitIdx!==null?'Note updated':'SOAP note saved');closePanel('panelSOAP');openClient(currentId);}
     else throw new Error(r.error);
   }catch(e){showToast('Save failed — try again');}
