@@ -7,213 +7,163 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      #FAF7F2;
-  --card:    #FFFFFF;
-  --border:  #E2D9CC;
-  --line:    #EDE6DB;
-  --muted:   #9A8F82;
-  --mid:     #6B5F52;
-  --ink:     #2C2419;
-  --gold:    #8B6914;
-  --gold-bg: #FDF5E4;
-  --green:   #3A6B45;
-  --green-bg:#EDF4EF;
-  --red:     #8B2A1A;
+  --bg:#FAF7F2; --card:#FFFFFF; --border:#E2D9CC; --line:#EDE6DB;
+  --muted:#9A8F82; --mid:#6B5F52; --ink:#2C2419;
+  --gold:#8B6914; --gold-bg:#FDF5E4; --gold-border:#D4A843;
+  --green:#3A6B45; --green-bg:#EDF4EF; --green-border:#6BAF7A;
+  --red:#8B2A1A; --red-bg:#FDF0EE; --red-border:#C0392B;
+  --blue:#1A4A8B; --blue-bg:#EEF3FD;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; font-size: 16px; line-height: 1.5; }
-
-/* SHELL */
-.shell { max-width: 520px; margin: 0 auto; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.5;}
+.shell{max-width:520px;margin:0 auto;}
 
 /* HEADER */
-.header {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(250,247,242,0.96);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 18px 20px 16px;
-}
-.header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.brand { display: flex; flex-direction: column; gap: 2px; }
-.brand-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--ink); letter-spacing: 0.04em; }
-.brand-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
-.btn-add {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: var(--ink); border: none;
-  color: #fff; font-size: 26px; line-height: 1;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: opacity 0.2s;
-}
-.btn-add:active { opacity: 0.75; }
-
-/* SEARCH */
-.search-wrap { position: relative; }
-.search-wrap input {
-  width: 100%; background: var(--card);
-  border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 12px 16px 12px 44px;
-  font-family: 'Inter', sans-serif; font-size: 16px; color: var(--ink);
-  outline: none; transition: border-color 0.2s;
-}
-.search-wrap input::placeholder { color: var(--muted); }
-.search-wrap input:focus { border-color: var(--gold); }
-.si { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; pointer-events: none; }
+.header{position:sticky;top:0;z-index:50;background:rgba(250,247,242,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 20px 14px;}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--ink);letter-spacing:0.03em;}
+.brand-sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-top:1px;}
+.btn-add{width:46px;height:46px;border-radius:50%;background:var(--ink);border:none;color:#fff;font-size:28px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.btn-add:active{opacity:0.75;}
+.search-wrap{position:relative;}
+.search-wrap input{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px 13px 46px;font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color 0.2s;}
+.search-wrap input::placeholder{color:var(--muted);}
+.search-wrap input:focus{border-color:var(--gold-border);}
+.si{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;pointer-events:none;}
 
 /* LIST */
-.list-pad { padding-bottom: 100px; }
-.sec-label {
-  font-family: 'JetBrains Mono', monospace; font-size: 10px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--muted); padding: 16px 20px 8px;
-}
-.client-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--line);
-  cursor: pointer; background: var(--card);
-  transition: background 0.15s;
-}
-.client-row:first-child { border-top: 1px solid var(--line); }
-.client-row:active { background: var(--gold-bg); }
-.avatar {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: var(--gold-bg); border: 1.5px solid var(--border);
-  color: var(--gold); font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.ci { flex: 1; min-width: 0; }
-.cname { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.csub { font-size: 13px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.vbadge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); background: var(--green-bg); border-radius: 20px; padding: 3px 10px; flex-shrink: 0; font-weight: 500; }
-
-.empty { padding: 60px 20px; text-align: center; }
-.empty-h { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; color: var(--muted); margin-bottom: 6px; }
-.empty-s { font-size: 15px; color: var(--muted); }
+.list-pad{padding-bottom:100px;}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:18px 20px 10px;}
+.client-row{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line);cursor:pointer;background:var(--card);transition:background 0.15s;}
+.client-row:first-child{border-top:1px solid var(--line);}
+.client-row:active{background:var(--gold-bg);}
+.avatar{width:50px;height:50px;border-radius:50%;background:var(--gold-bg);border:1.5px solid var(--gold-border);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ci{flex:1;min-width:0;}
+.cname{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.csub{font-size:14px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vbadge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);background:var(--green-bg);border:1px solid var(--green-border);border-radius:20px;padding:3px 10px;flex-shrink:0;font-weight:500;}
+.empty{padding:60px 20px;text-align:center;}
+.empty-h{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--muted);margin-bottom:8px;}
+.empty-s{font-size:15px;color:var(--muted);}
 
 /* SYNC */
-.sync-bar {
-  position: fixed; bottom: 0; width: 100%; max-width: 520px;
-  background: var(--card); border-top: 1px solid var(--border);
-  padding: 10px 20px; display: flex; align-items: center; gap: 8px;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
-}
-.sdot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-.sdot.loading { background: var(--gold); animation: blink 1s infinite; }
-.sdot.error { background: var(--red); }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+.sync-bar{position:fixed;bottom:0;width:100%;max-width:520px;background:var(--card);border-top:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.sdot.loading{background:var(--gold);animation:blink 1s infinite;}
+.sdot.error{background:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
 
 /* PANELS */
-.panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; }
-.panel.open { display: block; }
-.pbar {
-  position: sticky; top: 0; z-index: 10;
-  background: rgba(250,247,242,0.96); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 20px; display: flex; align-items: center; gap: 14px;
-}
-.btn-back { background: none; border: none; cursor: pointer; color: var(--gold); font-size: 24px; padding: 0; line-height: 1; display: flex; align-items: center; }
-.ptitle { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink); flex: 1; }
+.panel{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;}
+.panel.open{display:block;}
+.pbar{position:sticky;top:0;z-index:10;background:rgba(250,247,242,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;}
+.btn-back{background:none;border:none;cursor:pointer;color:var(--gold);font-size:26px;padding:0;line-height:1;display:flex;align-items:center;}
+.ptitle{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);flex:1;}
+.pbar-actions{display:flex;gap:8px;}
+.btn-icon{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer;color:var(--mid);transition:all 0.2s;}
+.btn-icon:active{background:var(--gold-bg);border-color:var(--gold-border);}
 
 /* HERO */
-.hero { padding: 28px 20px 24px; border-bottom: 1px solid var(--border); background: var(--card); }
-.hero-name { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; color: var(--ink); line-height: 1.1; margin-bottom: 16px; }
-.hero-name em { font-style: italic; color: var(--gold); }
-.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.mk { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-.mv { font-size: 15px; color: var(--ink); }
+.hero{padding:24px 20px;border-bottom:1px solid var(--border);background:var(--card);}
+.hero-name{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--ink);line-height:1.1;margin-bottom:16px;}
+.hero-name em{font-style:italic;color:var(--gold);}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.mk{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.mv{font-size:15px;color:var(--ink);}
 
 /* ACTIONS */
-.astrip { display: flex; gap: 10px; padding: 16px 20px; background: var(--card); border-bottom: 1px solid var(--border); }
-.btn-soap { flex: 1; padding: 14px; background: var(--ink); border: none; border-radius: 10px; color: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: opacity 0.2s; }
-.btn-soap:active { opacity: 0.8; }
-.btn-rcpt { padding: 14px 18px; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; color: var(--mid); font-family: 'Inter', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-.btn-rcpt:active { border-color: var(--gold); color: var(--gold); }
+.astrip{display:flex;gap:10px;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--border);}
+.btn-soap{flex:1;padding:14px;background:var(--ink);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-weight:600;font-size:16px;cursor:pointer;transition:opacity 0.2s;}
+.btn-soap:active{opacity:0.8;}
+.btn-rcpt{padding:14px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--mid);font-family:'Inter',sans-serif;font-size:15px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-rcpt:active{border-color:var(--gold-border);color:var(--gold);}
 
 /* HISTORY */
-.hist-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 18px 20px 10px; }
-.soap-card { margin: 0 16px 12px; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card); }
-.soap-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid transparent; transition: background 0.15s; }
-.soap-head:active { background: var(--gold-bg); }
-.sdate { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); font-weight: 500; }
-.ssnip { font-size: 14px; color: var(--muted); font-style: italic; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sbody { padding: 16px; display: none; border-top: 1px solid var(--line); }
-.sbody.open { display: block; }
-.ssec { margin-bottom: 16px; }
-.ssec:last-child { margin-bottom: 0; }
-.sk { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 4px; font-weight: 500; }
-.sv { font-size: 15px; color: var(--ink); line-height: 1.65; }
+.hist-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:18px 20px 10px;}
+.soap-card{margin:0 14px 12px;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;background:var(--card);}
+.soap-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;}
+.soap-head:active{background:var(--gold-bg);}
+.sdate{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:500;}
+.shead-right{display:flex;align-items:center;gap:10px;}
+.ssnip{font-size:13px;color:var(--muted);font-style:italic;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.btn-edit-soap{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--mid);font-family:'Inter',sans-serif;}
+.btn-edit-soap:active{background:var(--gold-bg);}
+.sbody{padding:16px;display:none;border-top:1px solid var(--line);}
+.sbody.open{display:block;}
+.ssec{margin-bottom:16px;}
+.ssec:last-child{margin-bottom:0;}
+.sk{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:5px;font-weight:500;}
+.sv{font-size:15px;color:var(--ink);line-height:1.65;white-space:pre-wrap;}
 
 /* FORMS */
-.fbody { padding: 24px 20px 80px; }
-.field { margin-bottom: 18px; }
-.flabel { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
-.flabel.soap { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; letter-spacing: 0; text-transform: none; color: var(--green); font-weight: 600; }
-.field input, .field textarea {
-  width: 100%; background: var(--card);
-  border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 13px 15px; font-family: 'Inter', sans-serif;
-  font-size: 16px; color: var(--ink); outline: none;
-  transition: border-color 0.2s; -webkit-appearance: none;
-}
-.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
-.field input:focus, .field textarea:focus { border-color: var(--gold); }
-.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; }
-.divider { height: 1px; background: var(--border); margin: 22px 0; }
-.stitle { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; color: var(--muted); margin-bottom: 18px; }
+.fbody{padding:22px 20px 80px;}
+.field{margin-bottom:18px;}
+.flabel{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;}
+.flabel.soap{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;letter-spacing:0;text-transform:none;color:var(--green);font-weight:600;}
+.field input,.field textarea{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);}
+.field input:focus,.field textarea:focus{border-color:var(--gold-border);}
+.field textarea{resize:vertical;min-height:90px;line-height:1.6;}
+input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
+.divider{height:1px;background:var(--border);margin:22px 0;}
+.stitle{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--mid);margin-bottom:18px;}
 
 /* UPLOAD */
-.uzone { border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px; text-align: center; cursor: pointer; margin-bottom: 14px; background: var(--card); transition: border-color 0.2s; }
-.uzone:active { border-color: var(--gold); }
-.uzone.filled { border-style: solid; border-color: var(--gold); padding: 12px; }
-.uzone.filled img { width: 100%; border-radius: 8px; }
-.uico { font-size: 32px; margin-bottom: 8px; }
-.utxt { font-size: 15px; color: var(--muted); }
-.uhint { font-size: 13px; color: var(--muted); opacity: 0.7; margin-top: 4px; }
+.uzone{border:2px dashed var(--border);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;margin-bottom:14px;background:var(--card);transition:border-color 0.2s;}
+.uzone:active{border-color:var(--gold-border);}
+.uzone.filled{border-style:solid;border-color:var(--gold-border);padding:12px;}
+.uzone.filled img{width:100%;border-radius:10px;}
+.uico{font-size:32px;margin-bottom:8px;}
+.utxt{font-size:15px;color:var(--muted);}
+.uhint{font-size:13px;color:var(--muted);opacity:0.7;margin-top:4px;}
+.btn-ai{width:100%;padding:14px;background:var(--gold-bg);border:1.5px solid var(--gold-border);border-radius:12px;color:var(--gold);font-family:'Inter',sans-serif;font-weight:600;font-size:16px;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;}
+.btn-ai:active:not(:disabled){background:var(--gold-border);color:#fff;}
+.btn-ai:disabled{opacity:0.4;cursor:not-allowed;}
+.ai-msg{border-radius:12px;padding:13px 16px;font-size:15px;margin-bottom:14px;display:none;}
+.ai-msg.ok{background:var(--green-bg);border:1.5px solid var(--green-border);color:var(--green);}
+.ai-msg.err{background:var(--red-bg);border:1.5px solid var(--red-border);color:var(--red);}
+.btn-save{width:100%;padding:16px;background:var(--ink);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-weight:600;font-size:17px;cursor:pointer;margin-top:10px;transition:opacity 0.2s;}
+.btn-save:active:not(:disabled){opacity:0.8;}
+.btn-save:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-danger{width:100%;padding:14px;background:var(--red-bg);border:1.5px solid var(--red-border);border-radius:12px;color:var(--red);font-family:'Inter',sans-serif;font-weight:600;font-size:16px;cursor:pointer;margin-top:10px;}
 
-.btn-ai {
-  width: 100%; padding: 14px;
-  background: var(--gold-bg); border: 1.5px solid var(--gold);
-  border-radius: 10px; color: var(--gold);
-  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px;
-  cursor: pointer; margin-bottom: 14px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: all 0.2s;
-}
-.btn-ai:active:not(:disabled) { background: var(--gold); color: #fff; }
-.btn-ai:disabled { opacity: 0.4; cursor: not-allowed; }
+/* SPIN */
+.spin{width:18px;height:18px;border:2.5px solid rgba(139,105,20,0.25);border-top-color:var(--gold);border-radius:50%;animation:rot 0.7s linear infinite;display:none;}
+@keyframes rot{to{transform:rotate(360deg);}}
 
-.ai-msg { border-radius: 10px; padding: 13px 16px; font-size: 15px; margin-bottom: 14px; display: none; }
-.ai-msg.ok { background: var(--green-bg); border: 1.5px solid var(--green); color: var(--green); }
-.ai-msg.err { background: #FDF0EE; border: 1.5px solid #C0392B; color: #8B2A1A; }
+/* BODY PART PICKER */
+.bp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.bp-btn{padding:12px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--mid);cursor:pointer;text-align:center;transition:all 0.15s;}
+.bp-btn.selected{background:var(--gold-bg);border-color:var(--gold-border);color:var(--gold);}
+.bp-btn:active{background:var(--gold-bg);}
 
-.btn-save {
-  width: 100%; padding: 16px;
-  background: var(--ink); border: none; border-radius: 10px;
-  color: #fff; font-family: 'Inter', sans-serif;
-  font-weight: 600; font-size: 17px; cursor: pointer;
-  margin-top: 10px; transition: opacity 0.2s;
-}
-.btn-save:active:not(:disabled) { opacity: 0.8; }
-.btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+/* MUSCLE PICKER */
+.muscle-section{margin-bottom:16px;}
+.muscle-part-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--green);margin-bottom:8px;font-weight:600;}
+.muscle-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.muscle-chip{padding:8px 13px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:14px;color:var(--mid);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.muscle-chip.selected{background:var(--green-bg);border-color:var(--green-border);color:var(--green);font-weight:500;}
 
-/* SPINNER */
-.spin { width: 18px; height: 18px; border: 2.5px solid rgba(139,105,20,0.25); border-top-color: var(--gold); border-radius: 50%; animation: rot 0.7s linear infinite; display: none; }
-@keyframes rot { to { transform: rotate(360deg); } }
+/* SYMPTOM BUILDER */
+.sym-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.sym-chip{padding:8px 13px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:14px;color:var(--mid);cursor:pointer;transition:all 0.15s;}
+.sym-chip.selected{background:var(--blue-bg);border-color:#6B9FD4;color:var(--blue);font-weight:500;}
+
+/* GENERATED SOAP */
+.soap-preview-box{background:var(--card);border:1.5px solid var(--green-border);border-radius:12px;padding:16px;margin-bottom:16px;}
+.soap-preview-box pre{font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;white-space:pre-wrap;color:var(--ink);}
 
 /* TOAST */
-.toast { position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%) translateY(14px); background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 24px; font-size: 15px; font-weight: 500; opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 999; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-size:15px;font-weight:500;opacity:0;transition:all 0.25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.18);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 <div class="shell">
   <div class="header">
     <div class="header-row">
-      <div class="brand">
+      <div>
         <div class="brand-name">Natural Thai</div>
         <div class="brand-sub">Clinical Notes</div>
       </div>
@@ -221,44 +171,45 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; }
     </div>
     <div class="search-wrap">
       <span class="si">⌕</span>
-      <input type="search" id="searchInput" placeholder="Search clients…" oninput="renderList()" autocomplete="off">
+      <input type="search" id="searchInput" placeholder="Search by name or phone…" oninput="renderList()" autocomplete="off">
     </div>
   </div>
-
   <div class="list-pad">
     <div class="sec-label">All Clients</div>
     <div id="clientList"></div>
   </div>
-
   <div class="sync-bar">
     <div class="sdot loading" id="syncDot"></div>
     <span id="syncText">Connecting to Google Sheets…</span>
   </div>
 </div>
 
-<!-- PANEL: DETAIL -->
+<!-- PANEL: CLIENT DETAIL -->
 <div class="panel" id="panelClient">
   <div class="pbar">
     <button class="btn-back" onclick="closePanel('panelClient')">←</button>
     <div class="ptitle" id="detailTitle"></div>
+    <div class="pbar-actions">
+      <button class="btn-icon" onclick="openEditClient()">✏️ Edit</button>
+    </div>
   </div>
   <div class="hero">
     <div class="hero-name" id="heroName"></div>
     <div class="meta-grid" id="metaGrid"></div>
   </div>
   <div class="astrip">
-    <button class="btn-soap" onclick="openSOAP()">+ Add SOAP Note</button>
+    <button class="btn-soap" onclick="openSOAP(false)">+ Add SOAP Note</button>
     <button class="btn-rcpt" onclick="goReceipt()">🧾 Receipt</button>
   </div>
   <div class="hist-label">Visit History</div>
   <div id="soapList" style="padding-bottom:48px"></div>
 </div>
 
-<!-- PANEL: NEW CLIENT -->
+<!-- PANEL: NEW/EDIT CLIENT -->
 <div class="panel" id="panelNewClient">
   <div class="pbar">
     <button class="btn-back" onclick="closePanel('panelNewClient')">←</button>
-    <div class="ptitle">New Client</div>
+    <div class="ptitle" id="clientFormTitle">New Client</div>
   </div>
   <div class="fbody">
     <div class="uzone" id="uploadZone" onclick="document.getElementById('fileIn').click()">
@@ -275,7 +226,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; }
     <div class="divider"></div>
     <div class="stitle">Client Details</div>
     <div class="field"><label class="flabel">Full Name *</label><input id="nc-name" placeholder="Charlotte Eccleston"></div>
-    <div class="field"><label class="flabel">Phone</label><input id="nc-phone" placeholder="+61 456 809 780"></div>
+    <div class="field"><label class="flabel">Phone</label><input id="nc-phone" placeholder="+61 456 809 780" type="tel"></div>
     <div class="field"><label class="flabel">Email</label><input id="nc-email" type="email" placeholder="name@email.com"></div>
     <div class="field"><label class="flabel">Health Fund</label><input id="nc-fund" placeholder="Medibank"></div>
     <div class="field"><label class="flabel">Date of Birth</label><input id="nc-dob" placeholder="May 7, 2001"></div>
@@ -291,46 +242,114 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; }
 <div class="panel" id="panelSOAP">
   <div class="pbar">
     <button class="btn-back" onclick="closePanel('panelSOAP')">←</button>
-    <div class="ptitle">SOAP Note</div>
+    <div class="ptitle" id="soapFormTitle">SOAP Note</div>
   </div>
   <div class="fbody">
     <div class="field"><label class="flabel">Date</label><input type="date" id="soap-date"></div>
     <div class="divider"></div>
-    <div class="field"><label class="flabel soap">S — Subjective</label><textarea id="soap-s" placeholder="Patient reports…"></textarea></div>
-    <div class="field"><label class="flabel soap">O — Objective</label><textarea id="soap-o" placeholder="Findings on assessment…"></textarea></div>
-    <div class="field"><label class="flabel soap">A — Assessment</label><textarea id="soap-a" placeholder="Clinical impression…"></textarea></div>
-    <div class="field"><label class="flabel soap">P — Plan</label><textarea id="soap-p" placeholder="Treatment plan…"></textarea></div>
-    <button class="btn-save" id="btnSaveSOAP" onclick="saveSOAP()">Save Note</button>
+
+    <!-- STEP 1: BODY PARTS -->
+    <div class="stitle">1. Select Body Area</div>
+    <div class="bp-grid" id="bpGrid"></div>
+
+    <!-- STEP 2: MUSCLES -->
+    <div id="muscleWrap" style="display:none">
+      <div class="stitle">2. Select Muscles</div>
+      <div id="muscleList"></div>
+    </div>
+
+    <!-- STEP 3: SYMPTOMS -->
+    <div id="symWrap" style="display:none">
+      <div class="stitle">3. Symptoms</div>
+      <div class="field">
+        <label class="flabel">Patient reports</label>
+        <div class="sym-row" id="symChips"></div>
+      </div>
+      <div class="field">
+        <label class="flabel">Additional notes (optional)</label>
+        <input id="sym-extra" placeholder="e.g. worse in morning, after exercise…">
+      </div>
+    </div>
+
+    <!-- GENERATE -->
+    <div id="genWrap" style="display:none;margin-bottom:16px;">
+      <button class="btn-ai" style="margin-bottom:0" onclick="generateSOAP()">
+        <span>✨ Generate SOAP Note</span>
+      </button>
+    </div>
+
+    <!-- PREVIEW + EDIT -->
+    <div id="soapPreviewWrap" style="display:none">
+      <div class="stitle">4. Review & Edit</div>
+      <div class="field"><label class="flabel soap">S — Subjective</label><textarea id="soap-s" rows="3"></textarea></div>
+      <div class="field"><label class="flabel soap">O — Objective</label><textarea id="soap-o" rows="3"></textarea></div>
+      <div class="field"><label class="flabel soap">A — Assessment</label><textarea id="soap-a" rows="2"></textarea></div>
+      <div class="field"><label class="flabel soap">P — Plan</label><textarea id="soap-p" rows="4"></textarea></div>
+      <button class="btn-save" id="btnSaveSOAP" onclick="saveSOAP()">Save Note</button>
+    </div>
+
+    <!-- MANUAL FALLBACK -->
+    <div class="divider"></div>
+    <div style="text-align:center;margin-bottom:12px;">
+      <button onclick="toggleManual()" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;text-decoration:underline;">or type manually instead</button>
+    </div>
+    <div id="manualWrap" style="display:none">
+      <div class="field"><label class="flabel soap">S — Subjective</label><textarea id="soap-sm" rows="3" placeholder="Pt. reports…"></textarea></div>
+      <div class="field"><label class="flabel soap">O — Objective</label><textarea id="soap-om" rows="3" placeholder="Tightness in…"></textarea></div>
+      <div class="field"><label class="flabel soap">A — Assessment</label><textarea id="soap-am" rows="2" placeholder="Myofascial…"></textarea></div>
+      <div class="field"><label class="flabel soap">P — Plan</label><textarea id="soap-pm" rows="4" placeholder="Therapeutic massage…"></textarea></div>
+      <button class="btn-save" id="btnSaveManual" onclick="saveSOAPManual()">Save Note</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT = 'https://script.google.com/macros/s/AKfycbzDajS1o3RJ96XWjT1iFzpK47tJYqyA3X-8kEVj0I_niaxsNoMOx40-tYnd67Cmqc39/exec';
-const RECEIPT = 'https://tanhataidangaem-bot.github.io/receiptgenerator/';
-let clients=[], currentId=null, imgB64=null;
+// ── DATA ─────────────────────────────────────
+const SCRIPT='https://script.google.com/macros/s/AKfycbxn2IGbq_USTCgq3EGck0X6O5mG-Y_TQ0O_7iXhbSk6DigkP3CslHSSERS1ZL50eVWf/exec';
+const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
 
-function sheetCall(p) {
+// BODY PARTS + MUSCLES
+const BODY_MAP={
+  'Head & Neck':{emoji:'🧠',muscles:['Suboccipitals','Upper Trapezius','SCM','Levator Scapulae','Scalenes','Splenius Capitis']},
+  'Shoulder':{emoji:'💪',muscles:['Deltoid (Anterior)','Deltoid (Posterior)','Supraspinatus','Infraspinatus','Teres Minor','Subscapularis','Rhomboids']},
+  'Upper Back':{emoji:'🔙',muscles:['Trapezius (Mid)','Trapezius (Lower)','Rhomboids','Erector Spinae (Thoracic)','Serratus Anterior']},
+  'Chest & Front':{emoji:'🫀',muscles:['Pectoralis Major','Pectoralis Minor','Serratus Anterior']},
+  'Arm':{emoji:'💪',muscles:['Biceps Brachii','Triceps Brachii','Forearm Flexors','Forearm Extensors','Brachialis']},
+  'Lower Back':{emoji:'⬇️',muscles:['Lumbar Erector Spinae','Quadratus Lumborum','Multifidus','Thoracolumbar Fascia']},
+  'Hip & Glutes':{emoji:'🦋',muscles:['Gluteus Maximus','Gluteus Medius','Gluteus Minimus','Piriformis','Iliopsoas','TFL','Hip Adductors']},
+  'Upper Leg':{emoji:'🦵',muscles:['Quadriceps (Rectus Femoris)','Quadriceps (Vastus Lateralis)','Quadriceps (Vastus Medialis)','Hamstrings (Biceps Femoris)','Hamstrings (Semimembranosus)','Hamstrings (Semitendinosus)','Adductors','IT Band']},
+  'Lower Leg':{emoji:'🦵',muscles:['Gastrocnemius','Soleus','Tibialis Anterior','Peroneals (Fibularis)','Popliteus']},
+  'Foot':{emoji:'🦶',muscles:['Plantar Fascia','Intrinsic Foot Muscles','Achilles Tendon']}
+};
+
+const SYMPTOMS=['tightness','discomfort','soreness','aching','stiffness','pain','restricted ROM','fatigue','referred pain','numbness (mild)'];
+const NO_SYMPTOMS=['no numbness','no referred pain','no radiation'];
+
+let clients=[],currentId=null,imgB64=null,editingClientId=null,editingVisitIdx=null;
+let selParts=new Set(),selMuscles=new Set(),selSyms=new Set(),selNoSyms=new Set();
+
+// ── SHEETS ────────────────────────────────────
+function sheetCall(p){
   return new Promise((res,rej)=>{
     const cb='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
     const url=SCRIPT+'?'+new URLSearchParams({...p,callback:cb});
     const s=document.createElement('script');
     window[cb]=d=>{delete window[cb];s.remove();res(d);};
     s.onerror=()=>{delete window[cb];s.remove();rej(new Error('Network error'));};
-    s.src=url; document.head.appendChild(s);
+    s.src=url;document.head.appendChild(s);
     setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error('Timeout'));}},15000);
   });
 }
 
 function setSync(state,msg){
-  const d=document.getElementById('syncDot');
-  d.className='sdot'+(state==='loading'?' loading':state==='error'?' error':'');
+  document.getElementById('syncDot').className='sdot'+(state==='loading'?' loading':state==='error'?' error':'');
   document.getElementById('syncText').textContent=msg;
 }
 
 async function loadClients(){
-  setSync('loading','Syncing with Google Sheets…');
+  setSync('loading','Syncing…');
   try{
     const r=await sheetCall({action:'getClients'});
     if(r.ok){clients=r.clients||[];setSync('ok',clients.length+' client'+(clients.length!==1?'s':'')+' · synced');}
@@ -339,26 +358,24 @@ async function loadClients(){
   renderList();
 }
 
+// ── LIST ──────────────────────────────────────
 function renderList(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  let list=clients.filter(c=>!q||(c.Name||'').toLowerCase().includes(q));
+  let list=clients.filter(c=>!q||(c.Name||'').toLowerCase().includes(q)||(c.Phone||'').toLowerCase().includes(q));
   list.sort((a,b)=>(a.Name||'').localeCompare(b.Name||''));
   const el=document.getElementById('clientList');
-  if(!list.length){
-    el.innerHTML='<div class="empty"><div class="empty-h">'+(q?'No results':'No clients yet')+'</div><div class="empty-s">'+(q?'Try a different name':'Tap + to add your first client')+'</div></div>';
-    return;
-  }
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-h">'+(q?'No results':'No clients yet')+'</div><div class="empty-s">'+(q?'Try name or phone':'Tap + to add your first client')+'</div></div>';return;}
   el.innerHTML=list.map(c=>{
     const ini=(c.Name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const sub=[c.Phone,c['Health Fund']].filter(Boolean).join(' · ')||'';
     return '<div class="client-row" onclick="openClient(\''+c.ID+'\')">'+
       '<div class="avatar">'+ini+'</div>'+
-      '<div class="ci"><div class="cname">'+(c.Name||'—')+'</div>'+
-      (sub?'<div class="csub">'+sub+'</div>':'')+'</div>'+
+      '<div class="ci"><div class="cname">'+(c.Name||'—')+'</div>'+(sub?'<div class="csub">'+sub+'</div>':'')+'</div>'+
       '</div>';
   }).join('');
 }
 
+// ── CLIENT DETAIL ─────────────────────────────
 async function openClient(id){
   currentId=id;
   const c=clients.find(x=>x.ID===id)||{};
@@ -377,33 +394,77 @@ function renderVisits(visits){
   const el=document.getElementById('soapList');
   if(!visits.length){el.innerHTML='<div style="padding:28px 20px;color:var(--muted);font-size:15px;font-style:italic">No visit notes yet</div>';return;}
   visits.sort((a,b)=>(b.Date||'').localeCompare(a.Date||''));
+  // store for editing
+  window._currentVisits=visits;
   el.innerHTML=visits.map((v,i)=>
     '<div class="soap-card">'+
     '<div class="soap-head" onclick="tv('+i+')">'+
-    '<span class="sdate">'+fmtDate(v.Date)+'</span>'+
-    '<span class="ssnip">'+(v.S||'—').slice(0,48)+'</span></div>'+
+    '<span class="sdate">'+(v.Date?fmtDateFull(v.Date):'No date')+'</span>'+
+    '<div class="shead-right">'+
+    '<span class="ssnip">'+(v.S||'—').slice(0,40)+'</span>'+
+    '<button class="btn-edit-soap" onclick="event.stopPropagation();editSOAP('+i+')">Edit</button>'+
+    '</div></div>'+
     '<div class="sbody" id="sb'+i+'">'+
-    (v.S?'<div class="ssec"><div class="sk">Subjective</div><div class="sv">'+v.S+'</div></div>':'')+
-    (v.O?'<div class="ssec"><div class="sk">Objective</div><div class="sv">'+v.O+'</div></div>':'')+
-    (v.A?'<div class="ssec"><div class="sk">Assessment</div><div class="sv">'+v.A+'</div></div>':'')+
-    (v.P?'<div class="ssec"><div class="sk">Plan</div><div class="sv">'+v.P+'</div></div>':'')+
+    (v.S?'<div class="ssec"><div class="sk">S — Subjective</div><div class="sv">'+escHtml(v.S)+'</div></div>':'')+
+    (v.O?'<div class="ssec"><div class="sk">O — Objective</div><div class="sv">'+escHtml(v.O)+'</div></div>':'')+
+    (v.A?'<div class="ssec"><div class="sk">A — Assessment</div><div class="sv">'+escHtml(v.A)+'</div></div>':'')+
+    (v.P?'<div class="ssec"><div class="sk">P — Plan</div><div class="sv">'+escHtml(v.P)+'</div></div>':'')+
     '</div></div>'
   ).join('');
 }
 
+function fmtDateFull(s){
+  if(!s)return'—';
+  try{
+    const [y,m,d]=s.split('-');
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return d+' '+months[parseInt(m)-1]+' '+y;
+  }catch(e){return s;}
+}
+
 function tv(i){document.getElementById('sb'+i).classList.toggle('open');}
-function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return(d&&m&&y)?d+'/'+m+'/'+y.slice(2):s;}
-function goReceipt(){const c=clients.find(x=>x.ID===currentId)||{};window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');}
+function escHtml(s){const d=document.createElement('div');d.innerText=s;return d.innerHTML;}
+
+function goReceipt(){
+  const c=clients.find(x=>x.ID===currentId)||{};
+  window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');
+}
+
+// ── PANELS ────────────────────────────────────
 function openPanel(id){document.getElementById(id).classList.add('open');}
 function closePanel(id){document.getElementById(id).classList.remove('open');}
 
+// ── NEW / EDIT CLIENT ─────────────────────────
 function openNewClient(){
+  editingClientId=null;
   imgB64=null;
+  document.getElementById('clientFormTitle').textContent='New Client';
   document.getElementById('uploadZone').className='uzone';
   document.getElementById('uploadZone').innerHTML='<div class="uico">📋</div><div class="utxt">Tap to upload intake form photo</div><div class="uhint">AI reads client details automatically</div>';
   document.getElementById('btnAI').disabled=true;
   document.getElementById('aiMsg').style.display='none';
   ['nc-name','nc-phone','nc-email','nc-fund','nc-dob','nc-address','nc-occ','nc-med','nc-meds'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('btnSaveClient').textContent='Save Client';
+  openPanel('panelNewClient');
+}
+
+function openEditClient(){
+  const c=clients.find(x=>x.ID===currentId)||{};
+  editingClientId=currentId;
+  document.getElementById('clientFormTitle').textContent='Edit Client';
+  document.getElementById('uploadZone').style.display='none';
+  document.getElementById('btnAI').style.display='none';
+  document.getElementById('aiMsg').style.display='none';
+  document.getElementById('nc-name').value=c.Name||'';
+  document.getElementById('nc-phone').value=c.Phone||'';
+  document.getElementById('nc-email').value=c.Email||'';
+  document.getElementById('nc-fund').value=c['Health Fund']||'';
+  document.getElementById('nc-dob').value=c.DOB||'';
+  document.getElementById('nc-address').value=c.Address||'';
+  document.getElementById('nc-occ').value=c.Occupation||'';
+  document.getElementById('nc-med').value=c.Medical||'';
+  document.getElementById('nc-meds').value=c.Meds||'';
+  document.getElementById('btnSaveClient').textContent='Update Client';
   openPanel('panelNewClient');
 }
 
@@ -428,24 +489,17 @@ async function readForm(){
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[
         {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imgB64}},
-        {type:'text',text:'Extract client information from this massage intake form. Return ONLY valid JSON: {"name":"","phone":"","email":"","dob":"","address":"","fund":"","occupation":"","medical":"","meds":""}'}
+        {type:'text',text:'Extract client information from this massage intake form image. Look carefully for all fields. Return ONLY valid JSON with no extra text:\n{"name":"","phone":"","email":"","dob":"","address":"","fund":"","occupation":"","medical":"","meds":""}'}
       ]}]})
     });
     const data=await res.json();
     const raw=data.content?.find(b=>b.type==='text')?.text||'';
     const info=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    if(info.name)document.getElementById('nc-name').value=info.name;
-    if(info.phone)document.getElementById('nc-phone').value=info.phone;
-    if(info.email)document.getElementById('nc-email').value=info.email;
-    if(info.fund)document.getElementById('nc-fund').value=info.fund;
-    if(info.dob)document.getElementById('nc-dob').value=info.dob;
-    if(info.address)document.getElementById('nc-address').value=info.address;
-    if(info.occupation)document.getElementById('nc-occ').value=info.occupation;
-    if(info.medical)document.getElementById('nc-med').value=info.medical;
-    if(info.meds)document.getElementById('nc-meds').value=info.meds;
-    msg.className='ai-msg ok';msg.textContent='✓ Details filled — review and save';msg.style.display='block';
+    const map={name:'nc-name',phone:'nc-phone',email:'nc-email',fund:'nc-fund',dob:'nc-dob',address:'nc-address',occupation:'nc-occ',medical:'nc-med',meds:'nc-meds'};
+    Object.entries(map).forEach(([k,id])=>{if(info[k])document.getElementById(id).value=info[k];});
+    msg.className='ai-msg ok';msg.textContent='✓ Details filled — check and save';msg.style.display='block';
     showToast('Form read successfully');
-  }catch(e){msg.className='ai-msg err';msg.textContent='✗ Could not read form — fill in manually';msg.style.display='block';}
+  }catch(e){msg.className='ai-msg err';msg.textContent='✗ Could not read — please fill in manually';msg.style.display='block';}
   btn.disabled=false;spin.style.display='none';txt.textContent='Read again';
 }
 
@@ -454,25 +508,182 @@ async function saveClient(){
   if(!name){showToast('Name is required');return;}
   const btn=document.getElementById('btnSaveClient');
   btn.disabled=true;btn.textContent='Saving…';
+  const payload={
+    name,phone:document.getElementById('nc-phone').value.trim(),
+    email:document.getElementById('nc-email').value.trim(),
+    fund:document.getElementById('nc-fund').value.trim(),
+    dob:document.getElementById('nc-dob').value.trim(),
+    address:document.getElementById('nc-address').value.trim(),
+    occupation:document.getElementById('nc-occ').value.trim(),
+    medical:document.getElementById('nc-med').value.trim(),
+    meds:document.getElementById('nc-meds').value.trim()
+  };
   try{
-    const r=await sheetCall({action:'addClient',name,phone:document.getElementById('nc-phone').value.trim(),email:document.getElementById('nc-email').value.trim(),fund:document.getElementById('nc-fund').value.trim(),dob:document.getElementById('nc-dob').value.trim(),address:document.getElementById('nc-address').value.trim(),occupation:document.getElementById('nc-occ').value.trim(),medical:document.getElementById('nc-med').value.trim(),meds:document.getElementById('nc-meds').value.trim()});
-    if(r.ok){showToast(name+' saved');closePanel('panelNewClient');await loadClients();}
-    else throw new Error(r.error);
+    if(editingClientId){
+      const r=await sheetCall({action:'updateClient',clientId:editingClientId,...payload});
+      if(r.ok){showToast('Client updated');closePanel('panelNewClient');await loadClients();openClient(editingClientId);}
+      else throw new Error(r.error);
+    }else{
+      const r=await sheetCall({action:'addClient',...payload});
+      if(r.ok){showToast(name+' added');closePanel('panelNewClient');await loadClients();}
+      else throw new Error(r.error);
+    }
   }catch(e){showToast('Save failed — try again');}
-  btn.disabled=false;btn.textContent='Save Client';
+  btn.disabled=false;
 }
 
-function openSOAP(){
+// ── SOAP BUILDER ──────────────────────────────
+function buildBPGrid(){
+  const grid=document.getElementById('bpGrid');
+  grid.innerHTML=Object.entries(BODY_MAP).map(([part,d])=>
+    '<button class="bp-btn'+(selParts.has(part)?' selected':'')+'" onclick="togglePart(\''+part+'\')">'+d.emoji+' '+part+'</button>'
+  ).join('');
+}
+
+function togglePart(part){
+  if(selParts.has(part))selParts.delete(part);
+  else selParts.add(part);
+  buildBPGrid();
+  buildMuscleList();
+}
+
+function buildMuscleList(){
+  const wrap=document.getElementById('muscleWrap');
+  if(selParts.size===0){wrap.style.display='none';document.getElementById('symWrap').style.display='none';document.getElementById('genWrap').style.display='none';return;}
+  wrap.style.display='block';
+  const ml=document.getElementById('muscleList');
+  ml.innerHTML=[...selParts].map(part=>{
+    const muscles=BODY_MAP[part].muscles;
+    return '<div class="muscle-section">'+
+      '<div class="muscle-part-title">'+part+'</div>'+
+      '<div class="muscle-grid">'+
+      muscles.map(m=>'<div class="muscle-chip'+(selMuscles.has(m)?' selected':'')+'" onclick="toggleMuscle(\''+m+'\')">'+m+'</div>').join('')+
+      '</div></div>';
+  }).join('');
+  buildSymRow();
+}
+
+function toggleMuscle(m){
+  if(selMuscles.has(m))selMuscles.delete(m);
+  else selMuscles.add(m);
+  buildMuscleList();
+}
+
+function buildSymRow(){
+  const wrap=document.getElementById('symWrap');
+  if(selMuscles.size===0){wrap.style.display='none';document.getElementById('genWrap').style.display='none';return;}
+  wrap.style.display='block';
+  document.getElementById('genWrap').style.display='block';
+  const sym=document.getElementById('symChips');
+  const allSym=[...SYMPTOMS,...NO_SYMPTOMS];
+  sym.innerHTML=allSym.map(s=>'<div class="sym-chip'+(selSyms.has(s)||selNoSyms.has(s)?' selected':'')+'" onclick="toggleSym(\''+s+'\')">'+s+'</div>').join('');
+}
+
+function toggleSym(s){
+  if(selSyms.has(s)||selNoSyms.has(s)){selSyms.delete(s);selNoSyms.delete(s);}
+  else if(NO_SYMPTOMS.includes(s))selNoSyms.add(s);
+  else selSyms.add(s);
+  buildSymRow();
+}
+
+function generateSOAP(){
+  const muscles=[...selMuscles];
+  const parts=[...selParts];
+  const syms=[...selSyms];
+  const noSyms=[...selNoSyms];
+  const extra=document.getElementById('sym-extra').value.trim();
+
+  // Build S
+  let sText='Pt. reports ';
+  if(syms.length){sText+=syms.join(', ')+' in '+partsToRegion(parts)+'.';}
+  else{sText+='discomfort in '+partsToRegion(parts)+'.';}
+  if(extra)sText+=' '+extra+'.';
+  if(noSyms.length)sText+=' '+noSyms.map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(', ')+'.';
+
+  // Build O
+  const muscleStr=muscles.length>1?muscles.slice(0,-1).join(', ')+', and '+muscles[muscles.length-1]:muscles[0]||'';
+  const oText='Tightness in '+muscleStr+'.';
+
+  // Build A
+  const aText=partsToRegion(parts)+' myofascial muscle tension.';
+
+  // Build P
+  const pText='Therapeutic massage with myofascial release and trigger point therapy to '+partsToRegion(parts)+'. Focus on '+muscleStr.toLowerCase()+' and improving tissue mobility. Pressure adjusted to client tolerance.';
+
+  document.getElementById('soap-s').value=sText;
+  document.getElementById('soap-o').value=oText;
+  document.getElementById('soap-a').value=aText;
+  document.getElementById('soap-p').value=pText;
+  document.getElementById('soapPreviewWrap').style.display='block';
+  document.getElementById('soapPreviewWrap').scrollIntoView({behavior:'smooth'});
+}
+
+function partsToRegion(parts){
+  if(parts.length===0)return'treated area';
+  if(parts.length===1)return parts[0].toLowerCase()+' region';
+  return parts.map(p=>p.toLowerCase()).join(' and ')+' regions';
+}
+
+function toggleManual(){
+  const w=document.getElementById('manualWrap');
+  w.style.display=w.style.display==='none'?'block':'none';
+}
+
+function openSOAP(editMode,visitIdx){
+  editingVisitIdx=editMode?visitIdx:null;
+  selParts=new Set();selMuscles=new Set();selSyms=new Set();selNoSyms=new Set();
+  document.getElementById('soapFormTitle').textContent=editMode?'Edit SOAP Note':'New SOAP Note';
   document.getElementById('soap-date').value=new Date().toISOString().split('T')[0];
-  ['soap-s','soap-o','soap-a','soap-p'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('muscleWrap').style.display='none';
+  document.getElementById('symWrap').style.display='none';
+  document.getElementById('genWrap').style.display='none';
+  document.getElementById('soapPreviewWrap').style.display='none';
+  document.getElementById('manualWrap').style.display='none';
+  ['soap-s','soap-o','soap-a','soap-p','soap-sm','soap-om','soap-am','soap-pm','sym-extra'].forEach(id=>document.getElementById(id).value='');
+  buildBPGrid();
+
+  if(editMode&&window._currentVisits&&window._currentVisits[visitIdx]){
+    const v=window._currentVisits[visitIdx];
+    document.getElementById('soap-date').value=v.Date||new Date().toISOString().split('T')[0];
+    document.getElementById('soap-s').value=v.S||'';
+    document.getElementById('soap-o').value=v.O||'';
+    document.getElementById('soap-a').value=v.A||'';
+    document.getElementById('soap-p').value=v.P||'';
+    document.getElementById('soapPreviewWrap').style.display='block';
+    document.getElementById('manualWrap').style.display='none';
+  }
   openPanel('panelSOAP');
 }
 
+function editSOAP(i){openSOAP(true,i);}
+
 async function saveSOAP(){
   const c=clients.find(x=>x.ID===currentId)||{};
-  const s=document.getElementById('soap-s').value.trim(),o=document.getElementById('soap-o').value.trim(),a=document.getElementById('soap-a').value.trim(),p=document.getElementById('soap-p').value.trim();
+  const s=document.getElementById('soap-s').value.trim();
+  const o=document.getElementById('soap-o').value.trim();
+  const a=document.getElementById('soap-a').value.trim();
+  const p=document.getElementById('soap-p').value.trim();
   if(!s&&!o&&!a&&!p){showToast('Fill in at least one field');return;}
   const btn=document.getElementById('btnSaveSOAP');
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const action=editingVisitIdx!==null?'updateVisit':'addVisit';
+    const visitId=editingVisitIdx!==null&&window._currentVisits?window._currentVisits[editingVisitIdx].ID:'';
+    const r=await sheetCall({action,visitId,clientId:currentId,clientName:c.Name||'',date:document.getElementById('soap-date').value,s,o,a,p});
+    if(r.ok){showToast(editingVisitIdx!==null?'Note updated':'SOAP note saved');closePanel('panelSOAP');openClient(currentId);}
+    else throw new Error(r.error);
+  }catch(e){showToast('Save failed — try again');}
+  btn.disabled=false;btn.textContent='Save Note';
+}
+
+async function saveSOAPManual(){
+  const c=clients.find(x=>x.ID===currentId)||{};
+  const s=document.getElementById('soap-sm').value.trim();
+  const o=document.getElementById('soap-om').value.trim();
+  const a=document.getElementById('soap-am').value.trim();
+  const p=document.getElementById('soap-pm').value.trim();
+  if(!s&&!o&&!a&&!p){showToast('Fill in at least one field');return;}
+  const btn=document.getElementById('btnSaveManual');
   btn.disabled=true;btn.textContent='Saving…';
   try{
     const r=await sheetCall({action:'addVisit',clientId:currentId,clientName:c.Name||'',date:document.getElementById('soap-date').value,s,o,a,p});
@@ -482,8 +693,12 @@ async function saveSOAP(){
   btn.disabled=false;btn.textContent='Save Note';
 }
 
-let tt;
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500);}
+// ── UTILS ─────────────────────────────────────
+function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return(d&&m&&y)?d+'/'+m+'/'+y.slice(2):s;}
+function goReceipt(){const c=clients.find(x=>x.ID===currentId)||{};window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');}
+function openPanel(id){document.getElementById(id).classList.add('open');}
+function closePanel(id){document.getElementById(id).classList.remove('open');}
+let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500);}
 
 loadClients();
 </script>
