@@ -351,7 +351,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
 
 <script>
 // ── DATA ─────────────────────────────────────
-const SCRIPT='https://script.google.com/macros/s/AKfycbxfmiPLQv7onXNzY3V1PaUObcwsH2Y5m7sbRHc4H9h2k8ihHcmAANZgJeyOaobBT89l/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycbyx4hibVK6BNgV3MPFwOoyNl9hgpMWXTbZBiAXvYQg-Td_MDIUBJr3_J7WbGNIF73uh/exec';
 const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
 
 // BODY PARTS + MUSCLES
@@ -405,8 +405,14 @@ async function loadClients(){
 // ── LIST ──────────────────────────────────────
 function renderList(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  let list=clients.filter(c=>!q||(c.Name||'').toLowerCase().includes(q)||(c.Phone||'').toLowerCase().includes(q));
-  list.sort((a,b)=>(a.Name||'').localeCompare(b.Name||''));
+  let list=clients.filter(c=>{
+    if(!q)return true;
+    const name=(c.Name||c.name||'').toLowerCase();
+    const phone=(c.Phone||c.phone||'').toLowerCase().replace(/\s+/g,'');
+    const qclean=q.replace(/\s+/g,'');
+    return name.includes(q)||phone.includes(qclean);
+  });
+  list.sort((a,b)=>(a.Name||a.name||'').localeCompare(b.Name||b.name||''));
   const el=document.getElementById('clientList');
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-h">'+(q?'No results':'No clients yet')+'</div><div class="empty-s">'+(q?'Try name or phone':'Tap + to add your first client')+'</div></div>';return;}
   el.innerHTML=list.map(c=>{
