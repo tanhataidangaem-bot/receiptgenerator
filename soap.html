@@ -351,7 +351,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
 
 <script>
 // ── DATA ─────────────────────────────────────
-const SCRIPT='https://script.google.com/macros/s/AKfycbyx4hibVK6BNgV3MPFwOoyNl9hgpMWXTbZBiAXvYQg-Td_MDIUBJr3_J7WbGNIF73uh/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycby22R531Y9B1Tikrz4uCkJwGsX9z5rbf9UMM0NFBVvxRDODOZi-Ir4VDY0OutTVn0I/exec';
 const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
 
 // BODY PARTS + MUSCLES
@@ -403,21 +403,28 @@ async function loadClients(){
 }
 
 // ── LIST ──────────────────────────────────────
+function getField(obj, ...keys) {
+  for (const k of keys) {
+    if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+  }
+  return '';
+}
+
 function renderList(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   let list=clients.filter(c=>{
     if(!q)return true;
-    const name=(c.Name||c.name||'').toLowerCase();
-    const phone=(c.Phone||c.phone||'').toLowerCase().replace(/\s+/g,'');
+    const name=getField(c,'Name','name').toLowerCase();
+    const phone=getField(c,'Phone','phone').toLowerCase().replace(/\s+/g,'');
     const qclean=q.replace(/\s+/g,'');
     return name.includes(q)||phone.includes(qclean);
   });
-  list.sort((a,b)=>(a.Name||a.name||'').localeCompare(b.Name||b.name||''));
+  list.sort((a,b)=>getField(a,'Name','name').localeCompare(getField(b,'Name','name')));
   const el=document.getElementById('clientList');
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-h">'+(q?'No results':'No clients yet')+'</div><div class="empty-s">'+(q?'Try name or phone':'Tap + to add your first client')+'</div></div>';return;}
   el.innerHTML=list.map(c=>{
-    const ini=(c.Name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const sub=[c.Phone,c['Health Fund']].filter(Boolean).join(' · ')||'';
+    const ini=(getField(c,'Name','name')||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const sub=[getField(c,'Phone','phone'),getField(c,'Health Fund','fund')].filter(Boolean).join(' · ')||'';
     return '<div class="client-row" onclick="openClient(\''+c.ID+'\')">'+
       '<div class="avatar">'+ini+'</div>'+
       '<div class="ci"><div class="cname">'+(c.Name||'—')+'</div>'+(sub?'<div class="csub">'+sub+'</div>':'')+'</div>'+
@@ -429,10 +436,20 @@ function renderList(){
 async function openClient(id){
   currentId=id;
   const c=clients.find(x=>x.ID===id)||{};
-  document.getElementById('detailTitle').textContent=c.Name||'Client';
-  const parts=(c.Name||'').split(' ');const last=parts.pop();const first=parts.join(' ');
+  const cname=getField(c,'Name','name')||'Client';
+  document.getElementById('detailTitle').textContent=cname;
+  const parts=cname.split(' ');const last=parts.pop();const first=parts.join(' ');
   document.getElementById('heroName').innerHTML=first?first+' <em>'+last+'</em>':'<em>'+last+'</em>';
-  const fs=[['Phone',c.Phone],['Health Fund',c['Health Fund']],['Email',c.Email],['Date of Birth',c.DOB],['Address',c.Address],['Occupation',c.Occupation],['Medical History',c.Medical],['Medications',c.Meds]].filter(([,v])=>v);
+  const fs=[
+    ['Phone',getField(c,'Phone','phone')],
+    ['Health Fund',getField(c,'Health Fund','fund')],
+    ['Email',getField(c,'Email','email')],
+    ['Date of Birth',getField(c,'DOB','dob')],
+    ['Address',getField(c,'Address','address')],
+    ['Occupation',getField(c,'Occupation','occupation')],
+    ['Medical History',getField(c,'Medical','medical')],
+    ['Medications',getField(c,'Meds','meds')]
+  ].filter(([,v])=>v);
   document.getElementById('metaGrid').innerHTML=fs.map(([k,v])=>'<div><div class="mk">'+k+'</div><div class="mv">'+v+'</div></div>').join('');
   openPanel('panelClient');
   document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted);font-size:15px">Loading visits…</div>';
@@ -455,6 +472,7 @@ function renderVisits(visits){
     '</div>'+
     '<div class="shead-right">'+
     '<button class="btn-edit-soap" onclick="event.stopPropagation();editSOAP('+i+')">Edit</button>'+
+    '<button class="btn-edit-soap" style="color:var(--red);border-color:var(--red-border);" onclick="event.stopPropagation();deleteVisit('+i+')">Delete</button>'+
     '</div></div>'+
     '<div class="sbody" id="sb'+i+'">'+
     (v.S?'<div class="ssec"><div class="sk">S — Subjective</div><div class="sv">'+escHtml(v.S)+'</div></div>':'')+
@@ -720,7 +738,7 @@ function openSOAP(editMode,visitIdx){
   editingVisitIdx=editMode?visitIdx:null;
   selParts=new Set();selMuscles=new Set();selSyms=new Set();selNoSyms=new Set();
   document.getElementById('soapFormTitle').textContent=editMode?'Edit SOAP Note':'New SOAP Note';
-  document.getElementById('soap-date').value=new Date().toISOString().split('T')[0];
+  const now=new Date();const localDate=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');document.getElementById('soap-date').value=localDate;
   document.getElementById('muscleWrap').style.display='none';
   document.getElementById('symWrap').style.display='none';
   document.getElementById('genWrap').style.display='none';
@@ -741,7 +759,7 @@ function openSOAP(editMode,visitIdx){
 
   if(editMode&&window._currentVisits&&window._currentVisits[visitIdx]){
     const v=window._currentVisits[visitIdx];
-    document.getElementById('soap-date').value=v.Date||new Date().toISOString().split('T')[0];
+    const nd=new Date();const ld=nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');document.getElementById('soap-date').value=v.Date||ld;
     document.getElementById('soap-s').value=v.S||'';
     document.getElementById('soap-o').value=v.O||'';
     document.getElementById('soap-a').value=v.A||'';
@@ -800,12 +818,28 @@ async function saveSOAPManual(){
 
 // ── UTILS ─────────────────────────────────────
 function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return(d&&m&&y)?d+'/'+m+'/'+y.slice(2):s;}
-function goReceipt(){const c=clients.find(x=>x.ID===currentId)||{};window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');}
+function goReceipt(){const c=clients.find(x=>x.ID===currentId)||{};window.open(RECEIPT+'?name='+encodeURIComponent(getField(c,'Name','name')||''),'_blank');}
+
+async function deleteVisit(i){
+  if(!confirm('Delete this SOAP note?')) return;
+  const v=window._currentVisits&&window._currentVisits[i];
+  if(!v) return;
+  try{
+    const r=await sheetCall({action:'deleteVisit',visitId:v.ID||v['ID']});
+    if(r.ok){showToast('Note deleted');openClient(currentId);}
+    else throw new Error(r.error||'failed');
+  }catch(e){showToast('Delete failed — try again');}
+}
 function openPanel(id){document.getElementById(id).classList.add('open');}
 function closePanel(id){document.getElementById(id).classList.remove('open');}
 let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500);}
 
-loadClients();
+// PASSWORD PROTECTION
+const PASS='happyending888';
+function checkAuth(){return localStorage.getItem('nt_auth')===PASS;}
+function showLogin(){document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF7F2;font-family:Inter,sans-serif;"><div style="background:#fff;border:1.5px solid #E2D9CC;border-radius:16px;padding:40px 32px;width:320px;text-align:center;"><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:600;margin-bottom:6px;">Natural Thai</div><div style="font-family:JetBrains Mono,monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8B6914;margin-bottom:28px;">Clinical Notes</div><input id="pinInput" type="password" placeholder="Enter password" style="width:100%;padding:13px 15px;border:1.5px solid #E2D9CC;border-radius:10px;font-size:16px;outline:none;margin-bottom:12px;text-align:center;" onkeydown="if(event.key==='Enter')doLogin()"><button onclick="doLogin()" style="width:100%;padding:14px;background:#2C2419;border:none;border-radius:10px;color:#fff;font-weight:600;font-size:16px;cursor:pointer;">Enter</button><div id="loginErr" style="color:#8B2A1A;font-size:13px;margin-top:10px;display:none;">Incorrect password</div></div></div>';setTimeout(()=>document.getElementById('pinInput').focus(),100);}
+function doLogin(){const val=document.getElementById('pinInput').value;if(val===PASS){localStorage.setItem('nt_auth',PASS);location.reload();}else{document.getElementById('loginErr').style.display='block';}}
+if(!checkAuth()){showLogin();}else{loadClients();}
 </script>
 </body>
 </html>
