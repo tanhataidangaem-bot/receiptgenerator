@@ -18,7 +18,7 @@
 html{-webkit-text-size-adjust:100%;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.5;}
 .shell{max-width:520px;margin:0 auto;}
-
+ 
 /* HEADER */
 .header{position:sticky;top:0;z-index:50;background:rgba(250,247,242,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 20px 14px;}
 .header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -31,7 +31,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .search-wrap input::placeholder{color:var(--muted);}
 .search-wrap input:focus{border-color:var(--gold-border);}
 .si{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;pointer-events:none;}
-
+ 
 /* LIST */
 .list-pad{padding-bottom:100px;}
 .sec-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:18px 20px 10px;}
@@ -46,14 +46,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .empty{padding:60px 20px;text-align:center;}
 .empty-h{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--muted);margin-bottom:8px;}
 .empty-s{font-size:15px;color:var(--muted);}
-
+ 
 /* SYNC */
 .sync-bar{position:fixed;bottom:0;width:100%;max-width:520px;background:var(--card);border-top:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
 .sdot.loading{background:var(--gold);animation:blink 1s infinite;}
 .sdot.error{background:var(--red);}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
-
+ 
 /* PANELS */
 .panel{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;}
 .panel.open{display:block;}
@@ -63,7 +63,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .pbar-actions{display:flex;gap:8px;}
 .btn-icon{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer;color:var(--mid);transition:all 0.2s;}
 .btn-icon:active{background:var(--gold-bg);border-color:var(--gold-border);}
-
+ 
 /* HERO */
 .hero{padding:24px 20px;border-bottom:1px solid var(--border);background:var(--card);}
 .hero-name{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--ink);line-height:1.1;margin-bottom:16px;}
@@ -71,14 +71,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .mk{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
 .mv{font-size:15px;color:var(--ink);}
-
+ 
 /* ACTIONS */
 .astrip{display:flex;gap:10px;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--border);}
 .btn-soap{flex:1;padding:14px;background:var(--ink);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-weight:600;font-size:16px;cursor:pointer;transition:opacity 0.2s;}
 .btn-soap:active{opacity:0.8;}
 .btn-rcpt{padding:14px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--mid);font-family:'Inter',sans-serif;font-size:15px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .btn-rcpt:active{border-color:var(--gold-border);color:var(--gold);}
-
+ 
 /* HISTORY */
 .hist-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:18px 20px 10px;}
 .soap-card{margin:0 14px 12px;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;background:var(--card);}
@@ -95,7 +95,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .ssec:last-child{margin-bottom:0;}
 .sk{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:5px;font-weight:500;}
 .sv{font-size:15px;color:var(--ink);line-height:1.65;white-space:pre-wrap;}
-
+ 
 /* FORMS */
 .fbody{padding:22px 20px 80px;}
 .field{margin-bottom:18px;}
@@ -108,7 +108,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
 .divider{height:1px;background:var(--border);margin:22px 0;}
 .stitle{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--mid);margin-bottom:18px;}
-
+ 
 /* UPLOAD */
 .uzone{border:2px dashed var(--border);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;margin-bottom:14px;background:var(--card);transition:border-color 0.2s;}
 .uzone:active{border-color:var(--gold-border);}
@@ -127,37 +127,37 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
 .btn-save:active:not(:disabled){opacity:0.8;}
 .btn-save:disabled{opacity:0.4;cursor:not-allowed;}
 .btn-danger{width:100%;padding:14px;background:var(--red-bg);border:1.5px solid var(--red-border);border-radius:12px;color:var(--red);font-family:'Inter',sans-serif;font-weight:600;font-size:16px;cursor:pointer;margin-top:10px;}
-
+ 
 /* SPIN */
 .spin{width:18px;height:18px;border:2.5px solid rgba(139,105,20,0.25);border-top-color:var(--gold);border-radius:50%;animation:rot 0.7s linear infinite;display:none;}
 @keyframes rot{to{transform:rotate(360deg);}}
-
+ 
 /* BODY PART PICKER */
 .bp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
 .bp-btn{padding:12px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--mid);cursor:pointer;text-align:center;transition:all 0.15s;}
 .bp-btn.selected{background:var(--gold-bg);border-color:var(--gold-border);color:var(--gold);}
 .bp-btn:active{background:var(--gold-bg);}
-
+ 
 /* MUSCLE PICKER */
 .muscle-section{margin-bottom:16px;}
 .muscle-part-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--green);margin-bottom:8px;font-weight:600;}
 .muscle-grid{display:flex;flex-wrap:wrap;gap:7px;}
 .muscle-chip{padding:8px 13px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:14px;color:var(--mid);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
 .muscle-chip.selected{background:var(--green-bg);border-color:var(--green-border);color:var(--green);font-weight:500;}
-
+ 
 /* SYMPTOM BUILDER */
 .sym-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
 .sym-chip{padding:8px 13px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:14px;color:var(--mid);cursor:pointer;transition:all 0.15s;}
 .sym-chip.selected{background:var(--blue-bg);border-color:#6B9FD4;color:var(--blue);font-weight:500;}
-
+ 
 /* GENERATED SOAP */
 .soap-preview-box{background:var(--card);border:1.5px solid var(--green-border);border-radius:12px;padding:16px;margin-bottom:16px;}
 .soap-preview-box pre{font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;white-space:pre-wrap;color:var(--ink);}
-
+ 
 /* PRESSURE */
 .pressure-btn{flex:1;padding:11px 6px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--mid);cursor:pointer;transition:all 0.15s;text-align:center;}
 .pressure-btn.selected{background:var(--gold-bg);border-color:var(--gold-border);color:var(--gold);}
-
+ 
 /* TOAST */
 .toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-size:15px;font-weight:500;opacity:0;transition:all 0.25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.18);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -187,7 +187,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
     <span id="syncText">Connecting to Google Sheets…</span>
   </div>
 </div>
-
+ 
 <!-- PANEL: CLIENT DETAIL -->
 <div class="panel" id="panelClient">
   <div class="pbar">
@@ -208,7 +208,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
   <div class="hist-label">Visit History</div>
   <div id="soapList" style="padding-bottom:48px"></div>
 </div>
-
+ 
 <!-- PANEL: NEW/EDIT CLIENT -->
 <div class="panel" id="panelNewClient">
   <div class="pbar">
@@ -241,7 +241,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
     <button class="btn-save" id="btnSaveClient" onclick="saveClient()">Save Client</button>
   </div>
 </div>
-
+ 
 <!-- PANEL: SOAP -->
 <div class="panel" id="panelSOAP">
   <div class="pbar">
@@ -250,7 +250,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
   </div>
   <div class="fbody">
     <div class="field"><label class="flabel">Date</label><input type="date" id="soap-date"></div>
-
+ 
     <!-- CLINICAL FIELDS -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
       <div class="field" style="margin:0">
@@ -270,7 +270,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
         </select>
       </div>
     </div>
-
+ 
     <!-- PRESSURE -->
     <div style="margin-bottom:18px;">
       <label class="flabel">Pressure</label>
@@ -280,24 +280,24 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
         <button type="button" class="pressure-btn selected" onclick="setPressure('Firm')" id="pr-Firm">🔥 Firm</button>
       </div>
     </div>
-
+ 
     <!-- COPY FROM LAST -->
     <div id="copyLastWrap" style="display:none;margin-bottom:16px;">
       <button type="button" onclick="copyLastSOAP()" style="width:100%;padding:12px;background:var(--blue-bg);border:1.5px solid #6B9FD4;border-radius:12px;color:var(--blue);font-family:'Inter',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">📋 Copy from last visit</button>
     </div>
-
+ 
     <div class="divider"></div>
-
+ 
     <!-- STEP 1: BODY PARTS -->
     <div class="stitle">1. Select Body Area</div>
     <div class="bp-grid" id="bpGrid"></div>
-
+ 
     <!-- STEP 2: MUSCLES -->
     <div id="muscleWrap" style="display:none">
       <div class="stitle">2. Select Muscles</div>
       <div id="muscleList"></div>
     </div>
-
+ 
     <!-- STEP 3: SYMPTOMS -->
     <div id="symWrap" style="display:none">
       <div class="stitle">3. Symptoms</div>
@@ -310,14 +310,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
         <input id="sym-extra" placeholder="e.g. worse in morning, after exercise…">
       </div>
     </div>
-
+ 
     <!-- GENERATE -->
     <div id="genWrap" style="display:none;margin-bottom:16px;">
       <button class="btn-ai" style="margin-bottom:0" onclick="generateSOAP()">
         <span>✨ Generate SOAP Note</span>
       </button>
     </div>
-
+ 
     <!-- PREVIEW + EDIT -->
     <div id="soapPreviewWrap" style="display:none">
       <div class="stitle">4. Review & Edit</div>
@@ -331,7 +331,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
       </div>
       <button class="btn-save" id="btnSaveSOAP" onclick="saveSOAP()">Save Note</button>
     </div>
-
+ 
     <!-- MANUAL FALLBACK -->
     <div class="divider"></div>
     <div style="text-align:center;margin-bottom:12px;">
@@ -346,14 +346,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;}
     </div>
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 // ── DATA ─────────────────────────────────────
 const SCRIPT='https://script.google.com/macros/s/AKfycbyx4hibVK6BNgV3MPFwOoyNl9hgpMWXTbZBiAXvYQg-Td_MDIUBJr3_J7WbGNIF73uh/exec';
 const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
-
+ 
 // BODY PARTS + MUSCLES
 const BODY_MAP={
   'Head & Neck':{emoji:'🧠',muscles:['Suboccipitals','Upper Trapezius','SCM','Levator Scapulae','Scalenes','Splenius Capitis']},
@@ -367,13 +367,13 @@ const BODY_MAP={
   'Lower Leg':{emoji:'🦵',muscles:['Gastrocnemius','Soleus','Tibialis Anterior','Peroneals (Fibularis)','Popliteus']},
   'Foot':{emoji:'🦶',muscles:['Plantar Fascia','Intrinsic Foot Muscles','Achilles Tendon']}
 };
-
+ 
 const SYMPTOMS=['tightness','discomfort','soreness','aching','stiffness','pain','restricted ROM','fatigue','referred pain','numbness (mild)'];
 const NO_SYMPTOMS=['no numbness','no referred pain','no radiation'];
-
+ 
 let clients=[],currentId=null,imgB64=null,editingClientId=null,editingVisitIdx=null;
 let selParts=new Set(),selMuscles=new Set(),selSyms=new Set(),selNoSyms=new Set();
-
+ 
 // ── SHEETS ────────────────────────────────────
 function sheetCall(p){
   return new Promise((res,rej)=>{
@@ -386,12 +386,12 @@ function sheetCall(p){
     setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error('Timeout'));}},15000);
   });
 }
-
+ 
 function setSync(state,msg){
   document.getElementById('syncDot').className='sdot'+(state==='loading'?' loading':state==='error'?' error':'');
   document.getElementById('syncText').textContent=msg;
 }
-
+ 
 async function loadClients(){
   setSync('loading','Syncing…');
   try{
@@ -401,7 +401,7 @@ async function loadClients(){
   }catch(e){setSync('error','Connection failed');showToast('Could not connect to Sheets');}
   renderList();
 }
-
+ 
 // ── LIST ──────────────────────────────────────
 function renderList(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
@@ -424,7 +424,7 @@ function renderList(){
       '</div>';
   }).join('');
 }
-
+ 
 // ── CLIENT DETAIL ─────────────────────────────
 async function openClient(id){
   currentId=id;
@@ -439,7 +439,7 @@ async function openClient(id){
   try{const r=await sheetCall({action:'getVisits',clientId:id});renderVisits(r.visits||[]);}
   catch(e){document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted)">Could not load visits</div>';}
 }
-
+ 
 function renderVisits(visits){
   const el=document.getElementById('soapList');
   if(!visits.length){el.innerHTML='<div style="padding:28px 20px;color:var(--muted);font-size:15px;font-style:italic">No visit notes yet</div>';return;}
@@ -465,7 +465,7 @@ function renderVisits(visits){
     '</div></div>';
   }).join('');
 }
-
+ 
 function fmtDateFull(s){
   if(!s)return'—';
   try{
@@ -488,19 +488,19 @@ function fmtDateFull(s){
     return clean;
   }catch(e){return String(s);}
 }
-
+ 
 function tv(i){document.getElementById('sb'+i).classList.toggle('open');}
 function escHtml(s){const d=document.createElement('div');d.innerText=s;return d.innerHTML;}
-
+ 
 function goReceipt(){
   const c=clients.find(x=>x.ID===currentId)||{};
   window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');
 }
-
+ 
 // ── PANELS ────────────────────────────────────
 function openPanel(id){document.getElementById(id).classList.add('open');}
 function closePanel(id){document.getElementById(id).classList.remove('open');}
-
+ 
 // ── NEW / EDIT CLIENT ─────────────────────────
 function openNewClient(){
   editingClientId=null;
@@ -514,7 +514,7 @@ function openNewClient(){
   document.getElementById('btnSaveClient').textContent='Save Client';
   openPanel('panelNewClient');
 }
-
+ 
 function openEditClient(){
   const c=clients.find(x=>x.ID===currentId)||{};
   editingClientId=currentId;
@@ -534,7 +534,7 @@ function openEditClient(){
   document.getElementById('btnSaveClient').textContent='Update Client';
   openPanel('panelNewClient');
 }
-
+ 
 function handleImg(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
@@ -547,7 +547,7 @@ function handleImg(e){
   };
   r.readAsDataURL(f);
 }
-
+ 
 async function readForm(){
   if(!imgB64)return;
   const btn=document.getElementById('btnAI'),spin=document.getElementById('aiSpin'),txt=document.getElementById('btnAITxt'),msg=document.getElementById('aiMsg');
@@ -569,7 +569,7 @@ async function readForm(){
   }catch(e){msg.className='ai-msg err';msg.textContent='✗ Could not read — please fill in manually';msg.style.display='block';}
   btn.disabled=false;spin.style.display='none';txt.textContent='Read again';
 }
-
+ 
 async function saveClient(){
   const name=document.getElementById('nc-name').value.trim();
   if(!name){showToast('Name is required');return;}
@@ -598,7 +598,7 @@ async function saveClient(){
   }catch(e){showToast('Save failed — try again');}
   btn.disabled=false;
 }
-
+ 
 // ── SOAP BUILDER ──────────────────────────────
 let selectedPressure='Firm';
 function setPressure(p){
@@ -608,7 +608,7 @@ function setPressure(p){
     if(b)b.className='pressure-btn'+(x===p?' selected':'');
   });
 }
-
+ 
 function copyLastSOAP(){
   if(!window._currentVisits||!window._currentVisits.length)return;
   const last=window._currentVisits[0]; // already sorted newest first
@@ -619,21 +619,21 @@ function copyLastSOAP(){
   document.getElementById('soapPreviewWrap').style.display='block';
   showToast('Copied from last visit — edit as needed');
 }
-
+ 
 function buildBPGrid(){
   const grid=document.getElementById('bpGrid');
   grid.innerHTML=Object.entries(BODY_MAP).map(([part,d])=>
     '<button class="bp-btn'+(selParts.has(part)?' selected':'')+'" onclick="togglePart(\''+part+'\')">'+d.emoji+' '+part+'</button>'
   ).join('');
 }
-
+ 
 function togglePart(part){
   if(selParts.has(part))selParts.delete(part);
   else selParts.add(part);
   buildBPGrid();
   buildMuscleList();
 }
-
+ 
 function buildMuscleList(){
   const wrap=document.getElementById('muscleWrap');
   if(selParts.size===0){wrap.style.display='none';document.getElementById('symWrap').style.display='none';document.getElementById('genWrap').style.display='none';return;}
@@ -649,13 +649,13 @@ function buildMuscleList(){
   }).join('');
   buildSymRow();
 }
-
+ 
 function toggleMuscle(m){
   if(selMuscles.has(m))selMuscles.delete(m);
   else selMuscles.add(m);
   buildMuscleList();
 }
-
+ 
 function buildSymRow(){
   const wrap=document.getElementById('symWrap');
   if(selMuscles.size===0){wrap.style.display='none';document.getElementById('genWrap').style.display='none';return;}
@@ -665,38 +665,38 @@ function buildSymRow(){
   const allSym=[...SYMPTOMS,...NO_SYMPTOMS];
   sym.innerHTML=allSym.map(s=>'<div class="sym-chip'+(selSyms.has(s)||selNoSyms.has(s)?' selected':'')+'" onclick="toggleSym(\''+s+'\')">'+s+'</div>').join('');
 }
-
+ 
 function toggleSym(s){
   if(selSyms.has(s)||selNoSyms.has(s)){selSyms.delete(s);selNoSyms.delete(s);}
   else if(NO_SYMPTOMS.includes(s))selNoSyms.add(s);
   else selSyms.add(s);
   buildSymRow();
 }
-
+ 
 function generateSOAP(){
   const muscles=[...selMuscles];
   const parts=[...selParts];
   const syms=[...selSyms];
   const noSyms=[...selNoSyms];
   const extra=document.getElementById('sym-extra').value.trim();
-
+ 
   // Build S
   let sText='Pt. reports ';
   if(syms.length){sText+=syms.join(', ')+' in '+partsToRegion(parts)+'.';}
   else{sText+='discomfort in '+partsToRegion(parts)+'.';}
   if(extra)sText+=' '+extra+'.';
   if(noSyms.length)sText+=' '+noSyms.map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(', ')+'.';
-
+ 
   // Build O
   const muscleStr=muscles.length>1?muscles.slice(0,-1).join(', ')+', and '+muscles[muscles.length-1]:muscles[0]||'';
   const oText='Tightness in '+muscleStr+'.';
-
+ 
   // Build A
   const aText=partsToRegion(parts)+' myofascial muscle tension.';
-
+ 
   // Build P
   const pText='Therapeutic massage with myofascial release and trigger point therapy to '+partsToRegion(parts)+'. Focus on '+muscleStr.toLowerCase()+' and improving tissue mobility. Pressure adjusted to client tolerance.';
-
+ 
   document.getElementById('soap-s').value=sText;
   document.getElementById('soap-o').value=oText;
   document.getElementById('soap-a').value=aText;
@@ -704,18 +704,18 @@ function generateSOAP(){
   document.getElementById('soapPreviewWrap').style.display='block';
   document.getElementById('soapPreviewWrap').scrollIntoView({behavior:'smooth'});
 }
-
+ 
 function partsToRegion(parts){
   if(parts.length===0)return'treated area';
   if(parts.length===1)return parts[0].toLowerCase()+' region';
   return parts.map(p=>p.toLowerCase()).join(' and ')+' regions';
 }
-
+ 
 function toggleManual(){
   const w=document.getElementById('manualWrap');
   w.style.display=w.style.display==='none'?'block':'none';
 }
-
+ 
 function openSOAP(editMode,visitIdx){
   editingVisitIdx=editMode?visitIdx:null;
   selParts=new Set();selMuscles=new Set();selSyms=new Set();selNoSyms=new Set();
@@ -731,14 +731,14 @@ function openSOAP(editMode,visitIdx){
   document.getElementById('soap-type').value='Subsequent';
   document.getElementById('soap-duration').value='60 min';
   document.getElementById('soap-note').value='';
-
+ 
   // Show copy last if visits exist
   const copyWrap=document.getElementById('copyLastWrap');
   if(window._currentVisits&&window._currentVisits.length>0&&!editMode){copyWrap.style.display='block';}
   else{copyWrap.style.display='none';}
-
+ 
   buildBPGrid();
-
+ 
   if(editMode&&window._currentVisits&&window._currentVisits[visitIdx]){
     const v=window._currentVisits[visitIdx];
     document.getElementById('soap-date').value=v.Date||new Date().toISOString().split('T')[0];
@@ -751,9 +751,9 @@ function openSOAP(editMode,visitIdx){
   }
   openPanel('panelSOAP');
 }
-
+ 
 function editSOAP(i){openSOAP(true,i);}
-
+ 
 async function saveSOAP(){
   const c=clients.find(x=>x.ID===currentId)||{};
   const s=document.getElementById('soap-s').value.trim();
@@ -780,7 +780,7 @@ async function saveSOAP(){
   }catch(e){showToast('Save failed — try again');}
   btn.disabled=false;btn.textContent='Save Note';
 }
-
+ 
 async function saveSOAPManual(){
   const c=clients.find(x=>x.ID===currentId)||{};
   const s=document.getElementById('soap-sm').value.trim();
@@ -797,15 +797,16 @@ async function saveSOAPManual(){
   }catch(e){showToast('Save failed — try again');}
   btn.disabled=false;btn.textContent='Save Note';
 }
-
+ 
 // ── UTILS ─────────────────────────────────────
 function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return(d&&m&&y)?d+'/'+m+'/'+y.slice(2):s;}
 function goReceipt(){const c=clients.find(x=>x.ID===currentId)||{};window.open(RECEIPT+'?name='+encodeURIComponent(c.Name||''),'_blank');}
 function openPanel(id){document.getElementById(id).classList.add('open');}
 function closePanel(id){document.getElementById(id).classList.remove('open');}
 let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500);}
-
+ 
 loadClients();
 </script>
 </body>
 </html>
+ 
