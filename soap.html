@@ -245,6 +245,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
   </div>
   <div class="fbody">
     <div class="field"><label class="flabel">Date</label><input type="date" id="soap-date"></div>
+    <div class="field"><label class="flabel">Therapist</label><input id="soap-therapist" placeholder="Therapist name" list="therapistList"><datalist id="therapistList"><option value="Tanny"><option value="Patcha"><option value="Melon"></datalist></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
       <div class="field" style="margin:0">
         <label class="flabel">Treatment Type</label>
@@ -411,35 +412,33 @@ function renderList(){
     const phone=String(getField(c,'Phone','phone')).toLowerCase().replace(/\s+/g,'');
     return name.includes(q)||phone.includes(q.replace(/\s+/g,''));
   });
-  // Sort: clients with no note ever come first, then oldest last-visit date first
+  // Sort: MOST RECENT note on top; clients never noted go to bottom
   list.sort((a,b)=>{
     const da=a.LastVisit||'';
     const db=b.LastVisit||'';
     if(!da&&!db)return getField(a,'Name','name').localeCompare(getField(b,'Name','name'));
-    if(!da)return -1;
-    if(!db)return 1;
-    return da.localeCompare(db); // oldest date first
+    if(!da)return 1;   // a has no note -> push down
+    if(!db)return -1;  // b has no note -> push down
+    return db.localeCompare(da); // most recent date first
   });
   const el=document.getElementById('clientList');
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-h">No results</div></div>';return;}
-  const todayStr=todayLocal();
   el.innerHTML=list.map(c=>{
     const nm=getField(c,'Name','name');
     const ini=(nm||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const sub=[getField(c,'Phone','phone'),getField(c,'Health Fund','fund')].filter(Boolean).join(' · ')||'';
+    let phone=String(getField(c,'Phone','phone')).replace(/^'/,'');
+    const sub=[phone,getField(c,'Health Fund','fund')].filter(Boolean).join(' · ')||'';
     const cid=String(getField(c,'ID','id'));
     const lastVisit=c.LastVisit||'';
     let badge='';
-    if(!lastVisit){
-      badge='<span class="stale-badge stale-none">No note yet</span>';
-    }else{
+    if(lastVisit){
       const days=daysSince(lastVisit);
-      if(days>0){
-        const cls=days>=7?'stale-red':days>=2?'stale-amber':'stale-ok';
-        badge='<span class="stale-badge '+cls+'">'+days+'d ago</span>';
-      }else{
-        badge='<span class="stale-badge stale-ok">Today</span>';
-      }
+      let cls,label;
+      if(days<=0){cls='stale-ok';label='Today';}
+      else if(days===1){cls='stale-ok';label='Yesterday';}
+      else if(days<7){cls='stale-amber';label=days+'d ago';}
+      else{cls='stale-red';label=fmtDateFull(lastVisit);}
+      badge='<span class="stale-badge '+cls+'">'+label+'</span>';
     }
     return '<div class="client-row" data-cid="'+escAttr(cid)+'" onclick="openClient(this.getAttribute(\'data-cid\'))">'+
       '<div class="avatar">'+ini+'</div>'+
@@ -450,7 +449,7 @@ function renderList(){
 
 function daysSince(dateStr){
   try{
-    let clean=String(dateStr).trim();
+    let clean=String(dateStr).trim().replace(/^'/,'');
     if(clean.includes('T'))clean=clean.split('T')[0];
     const parts=clean.split('-');
     if(parts.length!==3)return 0;
@@ -469,7 +468,7 @@ async function openClient(id){
   const parts=cname.split(' ');const last=parts.pop();const first=parts.join(' ');
   document.getElementById('heroName').innerHTML=first?first+' <em>'+last+'</em>':'<em>'+last+'</em>';
   const fs=[
-    ['Phone',getField(c,'Phone','phone')],['Health Fund',getField(c,'Health Fund','fund')],
+    ['Phone',String(getField(c,'Phone','phone')).replace(/^'/,'')],['Health Fund',getField(c,'Health Fund','fund')],
     ['Email',getField(c,'Email','email')],['Date of Birth',getField(c,'DOB','dob')],
     ['Address',getField(c,'Address','address')],['Occupation',getField(c,'Occupation','occupation')],
     ['Medical History',getField(c,'Medical','medical')],['Medications',getField(c,'Meds','meds')]
@@ -487,7 +486,7 @@ function renderVisits(visits){
   visits.sort((a,b)=>String(b.Date||'').localeCompare(String(a.Date||'')));
   window._currentVisits=visits;
   el.innerHTML=visits.map((v,i)=>{
-    const badges=[getField(v,'Treatment Type','TreatmentType'),v.Duration||'',v.Pressure?v.Pressure+' pressure':''].filter(Boolean);
+    const badges=[v.Therapist?'👤 '+v.Therapist:'',getField(v,'Treatment Type','TreatmentType'),v.Duration||'',v.Pressure?v.Pressure+' pressure':''].filter(Boolean);
     const vid=String(getField(v,'ID','id'));
     return '<div class="soap-card">'+
     '<div class="soap-head" onclick="tv('+i+')">'+
@@ -568,6 +567,7 @@ function openSOAP(isEdit){
     editingVisitId=null;
     document.getElementById('soapFormTitle').textContent='New SOAP Note';
     document.getElementById('soap-date').value=todayLocal();
+    document.getElementById('soap-therapist').value=localStorage.getItem('nt_lastTherapist')||'';
     document.getElementById('soap-type').value='Subsequent';
     document.getElementById('soap-duration').value='60 min';
     setPressure('Firm');
@@ -602,12 +602,13 @@ function editSOAP(idx){
   document.getElementById('soapFormTitle').textContent='Edit SOAP Note';
   let dStr='';
   if(v.Date){
-    const clean=String(v.Date);
-    if(clean.includes('T'))dStr=clean.split('T')[0];
-    else if(/^\d{4}-\d{2}-\d{2}$/.test(clean))dStr=clean;
+    let clean=String(v.Date).trim().replace(/^'/,'');
+    if(clean.includes('T'))clean=clean.split('T')[0];
+    if(/^\d{4}-\d{2}-\d{2}$/.test(clean))dStr=clean;
   }
   document.getElementById('soap-date').value=dStr||todayLocal();
   document.getElementById('soap-type').value=getField(v,'Treatment Type','TreatmentType')||'Subsequent';
+  document.getElementById('soap-therapist').value=v.Therapist||'';
   document.getElementById('soap-duration').value=v.Duration||'60 min';
   setPressure(v.Pressure||'Firm');
   document.getElementById('soap-s').value=v.S||'';
@@ -622,9 +623,12 @@ async function saveSOAP(){
   const date=document.getElementById('soap-date').value;
   if(!date){showToast('Please select a date');return;}
   const c=clients.find(x=>String(getField(x,'ID','id'))===String(currentId))||{};
+  const therapist=document.getElementById('soap-therapist').value.trim();
+  if(therapist)localStorage.setItem('nt_lastTherapist',therapist);
   setSync('loading','Saving note…');
   const payload={
     clientId:currentId,clientName:getField(c,'Name','name'),date,
+    therapist:therapist,
     treatmentType:document.getElementById('soap-type').value,
     duration:document.getElementById('soap-duration').value,
     pressure:currentPressure,
@@ -709,8 +713,9 @@ async function saveClient(){
     const r=await sheetCall(payload);
     if(r.ok){
       showToast('Client saved!');closePanel('panelNewClient');
+      const newId=editingClientId||r.clientId;
       await loadClients();
-      if(editingClientId)openClient(editingClientId);
+      if(newId)openClient(newId);
     }else throw new Error(r.error);
   }catch(e){setSync('error','Save failed');showToast('Could not save client');}
 }
@@ -758,7 +763,7 @@ function escAttr(s){
 function fmtDateFull(s){
   if(!s)return'—';
   try{
-    let clean=String(s).trim();
+    let clean=String(s).trim().replace(/^'/,'');
     if(clean.includes('T'))clean=clean.split('T')[0];
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     if(/^\d{4}-\d{2}-\d{2}$/.test(clean)){const [y,m,d]=clean.split('-');return d+' '+months[parseInt(m,10)-1]+' '+y;}
