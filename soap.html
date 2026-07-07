@@ -336,7 +336,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 <script>
 const SCRIPT='https://script.google.com/macros/s/AKfycbx0rFYNVg0cUQh28fkUQUeVTOr45OsoDDgGehRFC2mMCHCaB_mpDdiaOTrXQiWgBD6b/exec';
 const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
-const PASS='happyending888';
+let accessToken=localStorage.getItem('nt_session_token')||'';
 
 const BODY_MAP={
   'Head & Neck':{emoji:'🧠',muscles:['Suboccipitals','Upper Trapezius','SCM','Levator Scapulae','Scalenes','Splenius Capitis']},
@@ -356,11 +356,21 @@ let clients=[],currentId=null,imgB64=null,editingClientId=null,editingVisitId=nu
 let selParts=new Set(),selMuscles=new Set(),selSyms=new Set(),currentPressure='Firm';
 
 // ── LOGIN ──
-function doLogin(){
-  if(document.getElementById('pinInput').value===PASS){
-    localStorage.setItem('nt_auth',PASS);
+async function doLogin(){
+  const input=document.getElementById('pinInput');
+  const err=document.getElementById('loginErr');
+  err.style.display='none';
+  try{
+    const r=await sheetCall({action:'authLogin',password:input.value});
+    if(!r.ok) throw new Error(r.error||'Incorrect access code.');
+    accessToken=r.token;
+    localStorage.setItem('nt_session_token',accessToken);
+    input.value='';
     startApp();
-  }else{document.getElementById('loginErr').style.display='block';}
+  }catch(e){
+    err.textContent=e.message||'Incorrect access code.';
+    err.style.display='block';
+  }
 }
 function startApp(){
   document.getElementById('loginScreen').style.display='none';
@@ -368,8 +378,15 @@ function startApp(){
   initFormBuilders();
   loadClients();
 }
+function lockApp(){
+  localStorage.removeItem('nt_session_token');
+  accessToken='';
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('pinInput').focus();
+}
 window.onload=function(){
-  if(localStorage.getItem('nt_auth')===PASS){startApp();}
+  if(accessToken){startApp();}
   else{document.getElementById('pinInput').focus();}
 };
 
@@ -390,12 +407,22 @@ function initFormBuilders(){
 function sheetCall(p){
   return new Promise((res,rej)=>{
     const cb='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    const url=SCRIPT+'?'+new URLSearchParams({...p,callback:cb});
+    const payload={...p,callback:cb};
+    if(p.action!=='authLogin' && accessToken) payload.token=accessToken;
+    const url=SCRIPT+'?'+new URLSearchParams(payload);
     const s=document.createElement('script');
-    window[cb]=d=>{delete window[cb];s.remove();res(d);};
-    s.onerror=()=>{delete window[cb];s.remove();rej(new Error('Network error'));};
+    let finished=false;
+    const done=(d)=>{
+      if(finished)return;
+      finished=true;
+      delete window[cb];s.remove();
+      if(d&&d.code==='UNAUTHENTICATED'){lockApp();rej(new Error('Session expired. Please enter the access code again.'));return;}
+      res(d);
+    };
+    window[cb]=done;
+    s.onerror=()=>{if(!finished){finished=true;delete window[cb];s.remove();rej(new Error('Network error'));}};
     s.src=url;document.head.appendChild(s);
-    setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error('Timeout'));}},15000);
+    setTimeout(()=>{if(!finished){finished=true;delete window[cb];s.remove();rej(new Error('Timeout'));}},15000);
   });
 }
 
