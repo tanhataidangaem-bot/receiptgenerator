@@ -15,6 +15,7 @@
   --blue:#1A4A8B; --blue-bg:#EEF3FD;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+img{max-width:100%;height:auto;}
 html{-webkit-text-size-adjust:100%;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.5;}
 .shell{max-width:520px;margin:0 auto;}
@@ -56,7 +57,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .sdot.error{background:var(--red);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-.panel{position:fixed;inset:0;background:var(--bg);z-index:100;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;max-width:520px;margin:0 auto;}
+.panel{position:fixed;top:0;bottom:0;left:0;right:0;background:var(--bg);z-index:100;transform:translateX(105%);transition:transform .25s ease;overflow-y:auto;overflow-x:hidden;}
+.panel>*{max-width:520px;margin-left:auto;margin-right:auto;}
 .panel.open{transform:translateX(0);}
 .pbar{position:sticky;top:0;z-index:10;background:rgba(250,247,242,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:14px;}
 .btn-back{background:none;border:none;font-size:24px;color:var(--ink);cursor:pointer;padding:0;line-height:1;}
@@ -475,7 +477,7 @@ async function openClient(id){
   document.getElementById('metaGrid').innerHTML=fs.map(([k,v])=>'<div><div class="mk">'+k+'</div><div class="mv">'+v+'</div></div>').join('');
   openPanel('panelClient');
   document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted);font-size:15px">Loading visits…</div>';
-  try{const r=await sheetCall({action:'getVisits',clientId:id});renderVisits(r.visits||[]);}
+  try{const r=await sheetCall({action:'getVisits',clientId:id,clientName:cname});renderVisits(r.visits||[]);}
   catch(e){document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted)">Could not load visits</div>';}
 }
 
