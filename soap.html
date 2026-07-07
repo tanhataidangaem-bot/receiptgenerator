@@ -135,6 +135,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:14px 24px;border-radius:30px;font-size:15px;font-weight:500;opacity:0;transition:all .25s;z-index:200;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,0.25);white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+.save-choice{position:fixed;inset:0;background:rgba(32,26,18,.46);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:20px;}
+.save-choice.open{display:flex;}
+.save-choice-card{width:100%;max-width:480px;background:var(--card);border:1px solid var(--gold-border);border-radius:22px;padding:24px;box-shadow:0 18px 52px rgba(0,0,0,.28);}
+.save-choice-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.save-choice-copy{font-size:15px;color:var(--muted);margin-bottom:20px;}
+.save-choice-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.save-choice-secondary{padding:15px 12px;border:1.5px solid var(--border);border-radius:13px;background:var(--card);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--mid);cursor:pointer;}
+.save-choice-primary{padding:15px 12px;border:none;border-radius:13px;background:var(--ink);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;}
+
 /* LOGIN */
 #loginScreen{position:fixed;inset:0;background:linear-gradient(160deg,#2C2419 0%,#1A150D 100%);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;}
 .login-card{background:rgba(255,255,255,0.03);border:1px solid rgba(212,168,67,0.25);border-radius:28px;padding:48px 36px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4);backdrop-filter:blur(10px);}
@@ -311,10 +320,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-he
   </div>
 </div>
 
+<div class="save-choice" id="savedClientPrompt" role="dialog" aria-modal="true" aria-labelledby="savedClientPromptTitle">
+  <div class="save-choice-card">
+    <div class="save-choice-title" id="savedClientPromptTitle">Client saved</div>
+    <div class="save-choice-copy">Would you like to add today’s SOAP note now?</div>
+    <div class="save-choice-actions">
+      <button class="save-choice-secondary" type="button" onclick="closeSavedClientPrompt()">View profile</button>
+      <button class="save-choice-primary" type="button" onclick="addSOAPForSavedClient()">+ Add SOAP</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT='https://script.google.com/macros/s/AKfycby22R531Y9B1Tikrz4uCkJwGsX9z5rbf9UMM0NFBVvxRDODOZi-Ir4VDY0OutTVn0I/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycbx0rFYNVg0cUQh28fkUQUeVTOr45OsoDDgGehRFC2mMCHCaB_mpDdiaOTrXQiWgBD6b/exec';
 const RECEIPT='https://tanhataidangaem-bot.github.io/receiptgenerator/';
 const PASS='happyending888';
 
@@ -389,6 +409,39 @@ function getField(obj,...keys){
   return '';
 }
 
+// Dates are handled as calendar text, never as UTC browser Date strings.
+function normaliseDateText(value){
+  const raw=String(value||'').trim().replace(/^'/,'');
+  const iso=raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
+  if(iso)return iso[1]+'-'+iso[2]+'-'+iso[3];
+  const dmy=raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if(dmy){
+    let a=Number(dmy[1]),b=Number(dmy[2]),day=a,month=b;
+    if(a<=12&&b>12){month=a;day=b;}
+    return dmy[3]+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+  }
+  return raw;
+}
+
+function normalisePhoneForSave(value){
+  // Keep international +61 and leading 0, while removing accidental non-phone characters.
+  return String(value||'').replace(/[^0-9+()\s-]/g,'').trim();
+}
+
+function setButtonBusy(id,busy,busyLabel){
+  const button=document.getElementById(id);if(!button)return;
+  if(!button.dataset.label)button.dataset.label=button.textContent;
+  button.disabled=!!busy;
+  button.textContent=busy?busyLabel:button.dataset.label;
+}
+
+function apiErrorMessage(error,fallback){
+  console.error(error);
+  const message=String(error&&error.message?error.message:error||'');
+  if(/timeout|network|failed to fetch/i.test(message))return 'Connection problem — please try again';
+  return fallback;
+}
+
 async function loadClients(){
   setSync('loading','Syncing…');
   try{
@@ -408,28 +461,30 @@ function renderList(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   let list=clients.filter(c=>{
     if(!q)return true;
-    const name=getField(c,'Name','name').toLowerCase();
+    const name=String(getField(c,'Name','name')).toLowerCase();
     const phone=String(getField(c,'Phone','phone')).toLowerCase().replace(/\s+/g,'');
     return name.includes(q)||phone.includes(q.replace(/\s+/g,''));
   });
-  // Sort: MOST RECENT note on top; clients never noted go to bottom
+
+  // Sort by the latest SOAP entry or edit, not alphabetically or by the oldest visit date.
   list.sort((a,b)=>{
-    const da=a.LastVisit||'';
-    const db=b.LastVisit||'';
-    if(!da&&!db)return getField(a,'Name','name').localeCompare(getField(b,'Name','name'));
-    if(!da)return 1;   // a has no note -> push down
-    if(!db)return -1;  // b has no note -> push down
-    return db.localeCompare(da); // most recent date first
+    const aKey=String(a.LastNoteAt||a.LastVisit||'');
+    const bKey=String(b.LastNoteAt||b.LastVisit||'');
+    if(!aKey&&!bKey)return String(getField(a,'Name','name')).localeCompare(String(getField(b,'Name','name')));
+    if(!aKey)return 1;
+    if(!bKey)return -1;
+    return bKey.localeCompare(aKey);
   });
+
   const el=document.getElementById('clientList');
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-h">No results</div></div>';return;}
   el.innerHTML=list.map(c=>{
-    const nm=getField(c,'Name','name');
-    const ini=(nm||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    let phone=String(getField(c,'Phone','phone')).replace(/^'/,'');
-    const sub=[phone,getField(c,'Health Fund','fund')].filter(Boolean).join(' · ')||'';
+    const nm=String(getField(c,'Name','name'));
+    const ini=(nm||'?').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const phone=String(getField(c,'Phone','phone')).replace(/^'/,'');
+    const sub=[phone,getField(c,'Health Fund','fund')].filter(Boolean).join(' · ');
     const cid=String(getField(c,'ID','id'));
-    const lastVisit=c.LastVisit||'';
+    const lastVisit=normaliseDateText(c.LastVisit||'');
     let badge='';
     if(lastVisit){
       const days=daysSince(lastVisit);
@@ -438,22 +493,21 @@ function renderList(){
       else if(days===1){cls='stale-ok';label='Yesterday';}
       else if(days<7){cls='stale-amber';label=days+'d ago';}
       else{cls='stale-red';label=fmtDateFull(lastVisit);}
-      badge='<span class="stale-badge '+cls+'">'+label+'</span>';
+      badge='<span class="stale-badge '+cls+'">'+escHtml(label)+'</span>';
     }
     return '<div class="client-row" data-cid="'+escAttr(cid)+'" onclick="openClient(this.getAttribute(\'data-cid\'))">'+
-      '<div class="avatar">'+ini+'</div>'+
-      '<div class="ci"><div class="cname">'+nm+'</div>'+(sub?'<div class="csub">'+sub+'</div>':'')+'</div>'+
+      '<div class="avatar">'+escHtml(ini)+'</div>'+
+      '<div class="ci"><div class="cname">'+escHtml(nm)+'</div>'+(sub?'<div class="csub">'+escHtml(sub)+'</div>':'')+'</div>'+
       badge+'</div>';
   }).join('');
 }
 
 function daysSince(dateStr){
   try{
-    let clean=String(dateStr).trim().replace(/^'/,'');
-    if(clean.includes('T'))clean=clean.split('T')[0];
+    const clean=normaliseDateText(dateStr);
     const parts=clean.split('-');
     if(parts.length!==3)return 0;
-    const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+    const d=new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2]));
     const now=new Date();
     const nowLocal=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     return Math.round((nowLocal-d)/(1000*60*60*24));
@@ -463,47 +517,53 @@ function daysSince(dateStr){
 async function openClient(id){
   currentId=id;
   const c=clients.find(x=>String(getField(x,'ID','id'))===String(id))||{};
-  const cname=getField(c,'Name','name')||'Client';
+  const cname=String(getField(c,'Name','name')||'Client');
+  window._currentVisits=[];
   document.getElementById('detailTitle').textContent=cname;
   const parts=cname.split(' ');const last=parts.pop();const first=parts.join(' ');
-  document.getElementById('heroName').innerHTML=first?first+' <em>'+last+'</em>':'<em>'+last+'</em>';
+  document.getElementById('heroName').innerHTML=first?escHtml(first)+' <em>'+escHtml(last)+'</em>':'<em>'+escHtml(last)+'</em>';
   const fs=[
     ['Phone',String(getField(c,'Phone','phone')).replace(/^'/,'')],['Health Fund',getField(c,'Health Fund','fund')],
     ['Email',getField(c,'Email','email')],['Date of Birth',getField(c,'DOB','dob')],
     ['Address',getField(c,'Address','address')],['Occupation',getField(c,'Occupation','occupation')],
     ['Medical History',getField(c,'Medical','medical')],['Medications',getField(c,'Meds','meds')]
   ].filter(([,v])=>v);
-  document.getElementById('metaGrid').innerHTML=fs.map(([k,v])=>'<div><div class="mk">'+k+'</div><div class="mv">'+v+'</div></div>').join('');
+  document.getElementById('metaGrid').innerHTML=fs.map(([k,v])=>'<div><div class="mk">'+escHtml(k)+'</div><div class="mv">'+escHtml(v)+'</div></div>').join('');
   openPanel('panelClient');
   document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted);font-size:15px">Loading visits…</div>';
-  try{const r=await sheetCall({action:'getVisits',clientId:id,clientName:cname});renderVisits(r.visits||[]);}
-  catch(e){document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted)">Could not load visits</div>';}
+  try{
+    const r=await sheetCall({action:'getVisits',clientId:id,clientName:cname});
+    if(!r.ok)throw new Error(r.error||'Could not load visits');
+    renderVisits(r.visits||[]);
+  }catch(e){
+    document.getElementById('soapList').innerHTML='<div style="padding:24px 20px;color:var(--muted)">Could not load visits</div>';
+  }
 }
 
 function renderVisits(visits){
   const el=document.getElementById('soapList');
-  if(!visits.length){el.innerHTML='<div style="padding:28px 20px;color:var(--muted);font-size:15px;font-style:italic">No visit notes yet</div>';return;}
-  visits.sort((a,b)=>String(b.Date||'').localeCompare(String(a.Date||'')));
+  if(!visits.length){window._currentVisits=[];el.innerHTML='';return;}
+  visits.sort((a,b)=>normaliseDateText(b.Date||'').localeCompare(normaliseDateText(a.Date||'')));
   window._currentVisits=visits;
   el.innerHTML=visits.map((v,i)=>{
     const badges=[v.Therapist?'👤 '+v.Therapist:'',getField(v,'Treatment Type','TreatmentType'),v.Duration||'',v.Pressure?v.Pressure+' pressure':''].filter(Boolean);
     const vid=String(getField(v,'ID','id'));
     return '<div class="soap-card">'+
-    '<div class="soap-head" onclick="tv('+i+')">'+
-    '<div><span class="sdate">'+(v.Date?fmtDateFull(v.Date):'No date')+'</span>'+
-    (badges.length?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">'+badges.map(b=>'<span style="font-family:JetBrains Mono,monospace;font-size:10px;background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold);border-radius:10px;padding:2px 8px;">'+b+'</span>').join('')+'</div>':'')+
-    '</div>'+
-    '<div class="shead-right">'+
-    '<button class="btn-edit-soap" onclick="event.stopPropagation();editSOAP('+i+')">Edit</button>'+
-    '<button class="btn-edit-soap" style="color:var(--red);border-color:var(--red-border);" data-vid="'+escAttr(vid)+'" onclick="event.stopPropagation();deleteVisit(this.getAttribute(\'data-vid\'))">Delete</button>'+
-    '</div></div>'+
-    '<div class="sbody" id="sb'+i+'">'+
-    (v.S?'<div class="ssec"><div class="sk">S — Subjective</div><div class="sv">'+escHtml(v.S)+'</div></div>':'')+
-    (v.O?'<div class="ssec"><div class="sk">O — Objective</div><div class="sv">'+escHtml(v.O)+'</div></div>':'')+
-    (v.A?'<div class="ssec"><div class="sk">A — Assessment</div><div class="sv">'+escHtml(v.A)+'</div></div>':'')+
-    (v.P?'<div class="ssec"><div class="sk">P — Plan</div><div class="sv">'+escHtml(v.P)+'</div></div>':'')+
-    (getField(v,'Private Note','PrivateNote')?'<div class="ssec" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)"><div class="sk" style="color:var(--muted)">📝 Private Note</div><div class="sv" style="color:var(--muted);font-style:italic;">'+escHtml(getField(v,'Private Note','PrivateNote'))+'</div></div>':'')+
-    '</div></div>';
+      '<div class="soap-head" onclick="tv('+i+')">'+
+      '<div><span class="sdate">'+(v.Date?fmtDateFull(v.Date):'')+'</span>'+
+      (badges.length?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">'+badges.map(b=>'<span style="font-family:JetBrains Mono,monospace;font-size:10px;background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold);border-radius:10px;padding:2px 8px;">'+escHtml(b)+'</span>').join('')+'</div>':'')+
+      '</div>'+
+      '<div class="shead-right">'+
+      '<button class="btn-edit-soap" onclick="event.stopPropagation();editSOAP('+i+')">Edit</button>'+
+      '<button class="btn-edit-soap" style="color:var(--red);border-color:var(--red-border);" data-vid="'+escAttr(vid)+'" onclick="event.stopPropagation();deleteVisit(this.getAttribute(\'data-vid\'))">Delete</button>'+
+      '</div></div>'+
+      '<div class="sbody" id="sb'+i+'">'+
+      (v.S?'<div class="ssec"><div class="sk">S — Subjective</div><div class="sv">'+escHtml(v.S)+'</div></div>':'')+
+      (v.O?'<div class="ssec"><div class="sk">O — Objective</div><div class="sv">'+escHtml(v.O)+'</div></div>':'')+
+      (v.A?'<div class="ssec"><div class="sk">A — Assessment</div><div class="sv">'+escHtml(v.A)+'</div></div>':'')+
+      (v.P?'<div class="ssec"><div class="sk">P — Plan</div><div class="sv">'+escHtml(v.P)+'</div></div>':'')+
+      (getField(v,'Private Note','PrivateNote')?'<div class="ssec" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)"><div class="sk" style="color:var(--muted)">📝 Private Note</div><div class="sv" style="color:var(--muted);font-style:italic;">'+escHtml(getField(v,'Private Note','PrivateNote'))+'</div></div>':'')+
+      '</div></div>';
   }).join('');
 }
 
@@ -600,13 +660,8 @@ function editSOAP(idx){
   openSOAP(true);
   editingVisitId=String(getField(v,'ID','id'));
   document.getElementById('soapFormTitle').textContent='Edit SOAP Note';
-  let dStr='';
-  if(v.Date){
-    let clean=String(v.Date).trim().replace(/^'/,'');
-    if(clean.includes('T'))clean=clean.split('T')[0];
-    if(/^\d{4}-\d{2}-\d{2}$/.test(clean))dStr=clean;
-  }
-  document.getElementById('soap-date').value=dStr||todayLocal();
+  const dStr=normaliseDateText(v.Date||'');
+  document.getElementById('soap-date').value=/^\d{4}-\d{2}-\d{2}$/.test(dStr)?dStr:todayLocal();
   document.getElementById('soap-type').value=getField(v,'Treatment Type','TreatmentType')||'Subsequent';
   document.getElementById('soap-therapist').value=v.Therapist||'';
   document.getElementById('soap-duration').value=v.Duration||'60 min';
@@ -625,10 +680,11 @@ async function saveSOAP(){
   const c=clients.find(x=>String(getField(x,'ID','id'))===String(currentId))||{};
   const therapist=document.getElementById('soap-therapist').value.trim();
   if(therapist)localStorage.setItem('nt_lastTherapist',therapist);
+  setButtonBusy('btnSaveSOAP',true,'Saving…');
   setSync('loading','Saving note…');
   const payload={
     clientId:currentId,clientName:getField(c,'Name','name'),date,
-    therapist:therapist,
+    therapist,
     treatmentType:document.getElementById('soap-type').value,
     duration:document.getElementById('soap-duration').value,
     pressure:currentPressure,
@@ -642,9 +698,17 @@ async function saveSOAP(){
   else{payload.action='addVisit';}
   try{
     const r=await sheetCall(payload);
-    if(r.ok){showToast('SOAP note saved!');closePanel('panelSOAP');openClient(currentId);}
-    else throw new Error(r.error);
-  }catch(e){setSync('error','Save failed');showToast('Could not save note');}
+    if(!r.ok)throw new Error(r.error||'Could not save note');
+    await loadClients();
+    closePanel('panelSOAP');
+    await openClient(currentId);
+    showToast('SOAP note saved');
+  }catch(e){
+    setSync('error','Save failed');
+    showToast(apiErrorMessage(e,'Could not save note'));
+  }finally{
+    setButtonBusy('btnSaveSOAP',false,'Saving…');
+  }
 }
 
 async function deleteVisit(visitId){
@@ -652,9 +716,14 @@ async function deleteVisit(visitId){
   setSync('loading','Deleting…');
   try{
     const r=await sheetCall({action:'deleteVisit',visitId:visitId});
-    if(r.ok){showToast('Visit deleted');openClient(currentId);}
-    else throw new Error(r.error);
-  }catch(e){setSync('error','Delete failed');showToast('Could not delete visit');}
+    if(!r.ok)throw new Error(r.error||'Could not delete visit');
+    await loadClients();
+    await openClient(currentId);
+    showToast('Visit deleted');
+  }catch(e){
+    setSync('error','Delete failed');
+    showToast(apiErrorMessage(e,'Could not delete visit'));
+  }
 }
 
 function goReceipt(){
@@ -695,29 +764,38 @@ function openEditClient(){
 async function saveClient(){
   const name=document.getElementById('nc-name').value.trim();
   if(!name){showToast('Name is required');return;}
+  const isNewClient=!editingClientId;
+  setButtonBusy('btnSaveClient',true,'Saving…');
   setSync('loading','Saving client…');
   const payload={
     name,
-    phone:document.getElementById('nc-phone').value,
-    email:document.getElementById('nc-email').value,
-    fund:document.getElementById('nc-fund').value,
-    dob:document.getElementById('nc-dob').value,
-    address:document.getElementById('nc-address').value,
-    occupation:document.getElementById('nc-occ').value,
-    medical:document.getElementById('nc-med').value,
-    meds:document.getElementById('nc-meds').value
+    phone:normalisePhoneForSave(document.getElementById('nc-phone').value),
+    email:document.getElementById('nc-email').value.trim(),
+    fund:document.getElementById('nc-fund').value.trim(),
+    dob:document.getElementById('nc-dob').value.trim(),
+    address:document.getElementById('nc-address').value.trim(),
+    occupation:document.getElementById('nc-occ').value.trim(),
+    medical:document.getElementById('nc-med').value.trim(),
+    meds:document.getElementById('nc-meds').value.trim()
   };
   if(editingClientId){payload.action='updateClient';payload.clientId=editingClientId;}
   else{payload.action='addClient';}
   try{
     const r=await sheetCall(payload);
-    if(r.ok){
-      showToast('Client saved!');closePanel('panelNewClient');
-      const newId=editingClientId||r.clientId;
-      await loadClients();
-      if(newId)openClient(newId);
-    }else throw new Error(r.error);
-  }catch(e){setSync('error','Save failed');showToast('Could not save client');}
+    if(!r.ok)throw new Error(r.error||'Could not save client');
+    const clientId=editingClientId||r.clientId;
+    if(!clientId)throw new Error('Client was saved but no client ID was returned');
+    await loadClients();
+    closePanel('panelNewClient');
+    await openClient(clientId);
+    if(isNewClient)showSavedClientPrompt();
+    else showToast('Client details saved');
+  }catch(e){
+    setSync('error','Save failed');
+    showToast(apiErrorMessage(e,'Could not save client'));
+  }finally{
+    setButtonBusy('btnSaveClient',false,'Saving…');
+  }
 }
 
 function toggleManual(){
@@ -761,15 +839,25 @@ function escAttr(s){
 }
 
 function fmtDateFull(s){
-  if(!s)return'—';
-  try{
-    let clean=String(s).trim().replace(/^'/,'');
-    if(clean.includes('T'))clean=clean.split('T')[0];
-    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    if(/^\d{4}-\d{2}-\d{2}$/.test(clean)){const [y,m,d]=clean.split('-');return d+' '+months[parseInt(m,10)-1]+' '+y;}
-    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(clean)){const [d,m,y]=clean.split('/');return d.padStart(2,'0')+' '+months[parseInt(m,10)-1]+' '+y;}
-    return clean;
-  }catch(e){return String(s);}
+  const clean=normaliseDateText(s);
+  if(!clean)return'';
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(/^\d{4}-\d{2}-\d{2}$/.test(clean)){
+    const [y,m,d]=clean.split('-');
+    return d+' '+months[Number(m)-1]+' '+y;
+  }
+  return clean;
+}
+
+function showSavedClientPrompt(){
+  document.getElementById('savedClientPrompt').classList.add('open');
+}
+function closeSavedClientPrompt(){
+  document.getElementById('savedClientPrompt').classList.remove('open');
+}
+function addSOAPForSavedClient(){
+  closeSavedClientPrompt();
+  openSOAP(false);
 }
 
 function handleImg(e){
